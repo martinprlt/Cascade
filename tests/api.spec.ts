@@ -60,8 +60,7 @@ describe("API Routes Integration Tests", () => {
   });
 
   it("GET /api/validacion devuelve recall 1.0 contra evento dic-2024", async () => {
-    const req = new Request("http://localhost/api/validacion?escenarioId=esc-01");
-    const res = await validacionHandler(req);
+    const res = await validacionHandler();
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.recallPromedio).toBe(1.0);
