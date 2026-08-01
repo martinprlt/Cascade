@@ -64,11 +64,13 @@ function explicacionDeterministica(
   );
 }
 
-function construirPrompt(escenarioId: string, resultado: ResultadoSimulacion, duracionHoras: number): string {
+function construirPrompt(datos: DatosCascade, escenarioId: string, resultado: ResultadoSimulacion, duracionHoras: number): string {
+  const nombreDeNodo = (id: string) => datos.nodos.find((n) => n.id === id)?.nombre ?? id;
   const porSeveridad = (sev: string) =>
     Object.entries(resultado.severidadPorBarrio)
       .filter(([, s]) => s === sev)
-      .map(([id]) => id);
+      .map(([id]) => nombreDeNodo(id));
+
   const sinServicio = porSeveridad("sin_servicio");
   const bajaPresion = porSeveridad("baja_presion");
   const m = resultado.metricas;
@@ -77,15 +79,16 @@ function construirPrompt(escenarioId: string, resultado: ResultadoSimulacion, du
     `Barrios sin servicio (${m.usuariosSinServicio} usuarios): ${sinServicio.join(", ") || "ninguno"}.`,
     `Barrios con baja presion (${m.usuariosBajaPresion} usuarios): ${bajaPresion.join(", ") || "ninguno"}.`,
     `Horizonte Temporal: ${duracionHoras} h. Deficit estimado: ${m.deficitM3} m3. Camiones requeridos: ${m.camionesRequeridos}. Costo estimado: $ ${m.costoMitigacionARS.toLocaleString("es-AR")}.`,
-    "Instrucciones de Respuesta:",
+    "REGLA OBLIGATORIA: Usa siempre los nombres reales y legibles de los barrios (ejemplo: 'Barrio Procrear', 'Barrio Néstor Kirchner', 'Barrio Las Talas'). NUNCA uses los IDs técnicos como 'barrio-procrear' o 'barrio-nk-alta'.",
     "Provee una explicacion clara y una solucion operativa concreta en español rioplatense (3 a 4 oraciones maximo):",
-    "1. DIAGNÓSTICO: Explica la causa de la falla y qué elemento se descompuso o cerro.",
-    "2. AFECTACIÓN: Menciona el total de personas y barrios afectados.",
-    "3. SOLUCIÓN Y RECOMENDACIÓN: Provee una instruccion operativa precisa (ej: maniobrar valvulas de interconexion, desplegar flota de camiones cisterna o presurizar ramales).",
+    "1. DIAGNÓSTICO: Causa de la falla.",
+    "2. AFECTACIÓN: Total de personas y barrios afectados con sus nombres legibles.",
+    "3. SOLUCIÓN Y RECOMENDACIÓN OPERATIVA: Instruccion precisa (ej: maniobrar valvulas o despachar camiones).",
   ].join("\n");
 }
 
 async function explicacionLLM(
+  datos: DatosCascade,
   escenarioId: string,
   resultado: ResultadoSimulacion,
   duracionHoras: number,
@@ -109,9 +112,9 @@ async function explicacionLLM(
           {
             role: "system",
             content:
-              "Sos el Asistente IA de Inteligencia Operativa de CASCADE (red de agua de La Rioja). Tu trabajo es dar diagnostico claro y recomendacion operativa de solucion. Redacta directo sin preambulos. No inventes numeros ni barrios.",
+              "Sos el Asistente IA de Inteligencia Operativa de CASCADE (red de agua de La Rioja). Tu trabajo es dar diagnostico claro y recomendacion operativa de solucion usando NOMBRES REALES Y LEGIBLES DE BARRIOS (nunca IDs tecnicos). Redacta directo sin preambulos. No inventes numeros ni barrios.",
           },
-          { role: "user", content: construirPrompt(escenarioId, resultado, duracionHoras) },
+          { role: "user", content: construirPrompt(datos, escenarioId, resultado, duracionHoras) },
         ],
       }),
     });
@@ -137,7 +140,6 @@ export async function POST(req: Request) {
     }
 
     const datos = cargarDatosCascade();
-    // Allow custom scenarios to pass through cleanly
     if (validado.escenarioId !== "custom" && !datos.escenarios.some((e) => e.id === validado.escenarioId)) {
       return NextResponse.json({ error: `Escenario inexistente: ${validado.escenarioId}` }, { status: 404 });
     }
@@ -146,6 +148,7 @@ export async function POST(req: Request) {
     if (apiKey) {
       try {
         const explicacion = await explicacionLLM(
+          datos,
           validado.escenarioId,
           validado.resultado,
           validado.duracionHoras,
