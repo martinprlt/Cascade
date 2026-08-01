@@ -419,7 +419,7 @@ export default function NetworkView({
           }}
         >
           <span style={{ width: 7, height: 7, backgroundColor: is3D ? "#00f0ff" : "#51df8e", borderRadius: "50%", display: "inline-block" }}></span>
-          {is3D ? "J.A.R.V.I.S. 3D HOLOGRAM MODE (EXTRUDED BUILDINGS & UNDERGROUND PIPES)" : "SYSTEM: LA_RIOJA_AMP_MAP (1600x1000 Canvas)"}
+          {is3D ? "SISTEMA GIS | VISTA 3D DE RED Y TUBERÍAS SUBTERRÁNEAS" : "SYSTEM: LA_RIOJA_AMP_MAP (1600x1000 Canvas)"}
         </div>
 
         {/* Node Type & Pipeline Legend */}
@@ -478,19 +478,17 @@ export default function NetworkView({
         <button
           onClick={() => setIs3D(!is3D)}
           style={{
-            backgroundColor: is3D ? "#00f0ff" : "#1a2026",
-            color: is3D ? "#002b36" : "#51df8e",
-            border: `1px solid ${is3D ? "#00f0ff" : "#51df8e"}`,
-            padding: "4px 12px",
+            backgroundColor: is3D ? "#51df8e" : "#1a2026",
+            color: is3D ? "#00391d" : "#51df8e",
+            border: "1px solid #51df8e",
+            padding: "4px 10px",
             fontSize: 11,
-            fontWeight: 900,
+            fontWeight: "bold",
             borderRadius: 2,
             cursor: "pointer",
-            boxShadow: is3D ? "0 0 16px rgba(0,240,255,0.6)" : "none",
-            transition: "all 0.2s ease",
           }}
         >
-          {is3D ? "⚡ HOLOGRAMA 3D (ON)" : "🕶️ MODO 3D STARK"}
+          {is3D ? "MODO 3D (ON)" : "VISTA 3D"}
         </button>
 
         <button
