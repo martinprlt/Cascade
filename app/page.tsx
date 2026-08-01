@@ -105,6 +105,7 @@ export default function Home() {
   const [esCustom, setEsCustom] = useState<boolean>(false);
   const [nombreCustomActual, setNombreCustomActual] = useState<string>("");
   const [duracionHoras, setDuracionHoras] = useState<number>(48);
+  const [menuIzquierdoAbierto, setMenuIzquierdoAbierto] = useState<boolean>(true);
 
   const [resultado, setResultado] = useState<ResultadoSimulacion | null>(null);
   const [ranking, setRanking] = useState<RespuestaRanking | null>(null);
@@ -346,14 +347,36 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
           zIndex: 50,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          {/* Toggle Left Sidebar Button */}
+          <button
+            onClick={() => setMenuIzquierdoAbierto(!menuIzquierdoAbierto)}
+            title={menuIzquierdoAbierto ? "Ocultar panel de escenarios" : "Mostrar panel de escenarios"}
+            style={{
+              backgroundColor: "rgba(81, 223, 142, 0.12)",
+              border: `1px solid ${COLOR_PRIMARY}`,
+              color: COLOR_PRIMARY,
+              padding: "4px 8px",
+              borderRadius: 4,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: 11,
+              fontWeight: 800,
+            }}
+          >
+            {menuIzquierdoAbierto ? "◀ OCULTAR PANEL" : "▶ VER ESCENARIOS"}
+          </button>
+
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: 18, fontWeight: 900, color: COLOR_PRIMARY, letterSpacing: "-0.03em", lineHeight: 1 }}>
+            <span style={{ fontSize: 17, fontWeight: 900, color: COLOR_PRIMARY, letterSpacing: "-0.03em", lineHeight: 1 }}>
               CASCADE WATER SIM
             </span>
             <span style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>La Rioja Capital | Twin Digital</span>
           </div>
-          <nav style={{ display: "flex", gap: 12, fontSize: 12, fontWeight: "bold" }}>
+          
+          <nav style={{ display: "flex", gap: 12, fontSize: 12, fontWeight: "bold", marginLeft: 8 }}>
             <button
               onClick={() => setTabActiva("mapa")}
               style={{
@@ -467,142 +490,186 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
       {/* TAB 1: Main Integrated 3-Column Viewport (NO Page Scrollbar) */}
       {tabActiva === "mapa" && (
         <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative", height: "calc(100vh - 52px)" }}>
-          {/* Left Column: Control Center & Scenario Selector (300px) */}
+          {/* Left Column: Collapsible Control Center & Scenario Selector (300px <-> 0px) */}
           <aside
             style={{
-              width: 300,
+              width: menuIzquierdoAbierto ? 300 : 0,
+              opacity: menuIzquierdoAbierto ? 1 : 0,
               backgroundColor: "rgba(22, 28, 34, 0.98)",
-              borderRight: `1px solid ${COLOR_BORDER}`,
-              padding: 14,
+              borderRight: menuIzquierdoAbierto ? `1px solid ${COLOR_BORDER}` : "none",
+              padding: menuIzquierdoAbierto ? 14 : 0,
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
               flexShrink: 0,
               overflowY: "auto",
+              overflowX: "hidden",
+              transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
               zIndex: 30,
             }}
           >
-            <div>
-              <h3 style={{ fontSize: 10, fontWeight: 700, color: "#bccabc", letterSpacing: "0.08em", marginBottom: 10, textTransform: "uppercase" }}>
-                CENTRO DE CONTROL | ESCENARIOS
-              </h3>
-
-              {/* Custom Scenario Active Alert Banner */}
-              {esCustom && (
-                <div
-                  style={{
-                    backgroundColor: "rgba(247, 144, 9, 0.15)",
-                    border: `1px solid ${COLOR_WARNING}`,
-                    borderRadius: 4,
-                    padding: 8,
-                    marginBottom: 10,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 4,
-                  }}
-                >
-                  <span style={{ fontSize: 9, fontWeight: 800, color: COLOR_WARNING, letterSpacing: "0.05em" }}>
-                    ⚡ ESCENARIO PERSONALIZADO EN VIVO
-                  </span>
-                  <span style={{ fontSize: 11, fontWeight: "bold", color: "#E2E8F0" }}>
-                    {nombreCustomActual}
-                  </span>
-                  <button
-                    onClick={() => void simular("esc-01")}
-                    style={{
-                      marginTop: 2,
-                      backgroundColor: COLOR_WARNING,
-                      color: "#000000",
-                      border: "none",
-                      padding: "4px 8px",
-                      fontSize: 9,
-                      fontWeight: 800,
-                      borderRadius: 2,
-                      cursor: "pointer",
-                    }}
-                  >
-                    Restablecer Escenario Base
-                  </button>
-                </div>
-              )}
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {escenarios.map((e) => {
-                  const activo = !esCustom && e.id === seleccionado;
-                  return (
+            {menuIzquierdoAbierto && (
+              <>
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                    <h3 style={{ fontSize: 10, fontWeight: 700, color: "#bccabc", letterSpacing: "0.08em", margin: 0, textTransform: "uppercase" }}>
+                      CENTRO DE CONTROL | ESCENARIOS
+                    </h3>
                     <button
-                      key={e.id}
-                      onClick={() => void simular(e.id)}
-                      disabled={cargando}
+                      onClick={() => setMenuIzquierdoAbierto(false)}
+                      style={{ background: "none", border: "none", color: "#64748B", cursor: "pointer", fontSize: 12 }}
+                      title="Plegar panel"
+                    >
+                      ◀
+                    </button>
+                  </div>
+
+                  {/* Custom Scenario Active Alert Banner */}
+                  {esCustom && (
+                    <div
                       style={{
-                        width: "100%",
-                        textAlign: "left",
-                        padding: 10,
-                        backgroundColor: activo ? "rgba(81, 223, 142, 0.1)" : COLOR_CARD,
-                        border: `1px solid ${activo ? "rgba(81, 223, 142, 0.5)" : COLOR_BORDER}`,
+                        backgroundColor: "rgba(247, 144, 9, 0.15)",
+                        border: `1px solid ${COLOR_WARNING}`,
                         borderRadius: 4,
-                        color: "#E2E8F0",
-                        cursor: cargando ? "wait" : "pointer",
+                        padding: 8,
+                        marginBottom: 10,
                         display: "flex",
                         flexDirection: "column",
-                        gap: 2,
-                        transition: "all 0.15s ease",
+                        gap: 4,
                       }}
                     >
-                      {activo && (
-                        <span style={{ fontSize: 8, fontWeight: 800, color: COLOR_PRIMARY, letterSpacing: "0.05em" }}>
-                          ACTIVO ACTUALMENTE
-                        </span>
-                      )}
-                      <span style={{ fontSize: 12, fontWeight: "bold", lineHeight: 1.3 }}>{e.nombre}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+                      <span style={{ fontSize: 9, fontWeight: 800, color: COLOR_WARNING, letterSpacing: "0.05em" }}>
+                        ⚡ ESCENARIO PERSONALIZADO EN VIVO
+                      </span>
+                      <span style={{ fontSize: 11, fontWeight: "bold", color: "#E2E8F0" }}>
+                        {nombreCustomActual}
+                      </span>
+                      <button
+                        onClick={() => void simular("esc-01")}
+                        style={{
+                          marginTop: 2,
+                          backgroundColor: COLOR_WARNING,
+                          color: "#000000",
+                          border: "none",
+                          padding: "4px 8px",
+                          fontSize: 9,
+                          fontWeight: 800,
+                          borderRadius: 2,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Restablecer Escenario Base
+                      </button>
+                    </div>
+                  )}
 
-            {/* Recommended Action Card */}
-            <div style={{ marginTop: 12 }}>
-              {mejorManiobra && !esCustom ? (
-                <div
-                  style={{
-                    backgroundColor: COLOR_PRIMARY,
-                    color: "#00391d",
-                    padding: 12,
-                    borderRadius: 4,
-                    boxShadow: "0 6px 18px rgba(81, 223, 142, 0.2)",
-                  }}
-                >
-                  <div style={{ fontSize: 8, fontWeight: 800, letterSpacing: "0.08em", marginBottom: 2, opacity: 0.85 }}>
-                    MANIOBRA RECOMENDADA
-                  </div>
-                  <div style={{ fontSize: 13, fontWeight: 900, textTransform: "uppercase", lineHeight: 1.2 }}>
-                    {mejorManiobra.nombre}
-                  </div>
-                  <div style={{ marginTop: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 9, fontWeight: "bold", opacity: 0.9 }}>
-                      CONFIDENCIA: 98.4%
-                    </span>
-                    <button
-                      onClick={() => void simular("esc-05")}
-                      style={{
-                        backgroundColor: "#00391d",
-                        color: COLOR_PRIMARY,
-                        padding: "4px 8px",
-                        fontSize: 9,
-                        fontWeight: 800,
-                        border: "none",
-                        borderRadius: 2,
-                        cursor: "pointer",
-                      }}
-                    >
-                      EJECUTAR
-                    </button>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {escenarios.map((e) => {
+                      const activo = !esCustom && e.id === seleccionado;
+                      return (
+                        <button
+                          key={e.id}
+                          onClick={() => void simular(e.id)}
+                          disabled={cargando}
+                          style={{
+                            width: "100%",
+                            textAlign: "left",
+                            padding: 10,
+                            backgroundColor: activo ? "rgba(81, 223, 142, 0.1)" : COLOR_CARD,
+                            border: `1px solid ${activo ? "rgba(81, 223, 142, 0.5)" : COLOR_BORDER}`,
+                            borderRadius: 4,
+                            color: "#E2E8F0",
+                            cursor: cargando ? "wait" : "pointer",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
+                            transition: "all 0.15s ease",
+                          }}
+                        >
+                          {activo && (
+                            <span style={{ fontSize: 8, fontWeight: 800, color: COLOR_PRIMARY, letterSpacing: "0.05em" }}>
+                              ACTIVO ACTUALMENTE
+                            </span>
+                          )}
+                          <span style={{ fontSize: 12, fontWeight: "bold", lineHeight: 1.3 }}>{e.nombre}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-              ) : null}
-            </div>
+
+                {/* Recommended Action Card */}
+                <div style={{ marginTop: 12 }}>
+                  {mejorManiobra && !esCustom ? (
+                    <div
+                      style={{
+                        backgroundColor: COLOR_PRIMARY,
+                        color: "#00391d",
+                        padding: 12,
+                        borderRadius: 4,
+                        boxShadow: "0 6px 18px rgba(81, 223, 142, 0.2)",
+                      }}
+                    >
+                      <div style={{ fontSize: 8, fontWeight: 800, letterSpacing: "0.08em", marginBottom: 2, opacity: 0.85 }}>
+                        MANIOBRA RECOMENDADA
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 900, textTransform: "uppercase", lineHeight: 1.2 }}>
+                        {mejorManiobra.nombre}
+                      </div>
+                      <div style={{ marginTop: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: 9, fontWeight: "bold", opacity: 0.9 }}>
+                          CONFIDENCIA: 98.4%
+                        </span>
+                        <button
+                          onClick={() => void simular("esc-05")}
+                          style={{
+                            backgroundColor: "#00391d",
+                            color: COLOR_PRIMARY,
+                            padding: "4px 8px",
+                            fontSize: 9,
+                            fontWeight: 800,
+                            border: "none",
+                            borderRadius: 2,
+                            cursor: "pointer",
+                          }}
+                        >
+                          EJECUTAR
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </>
+            )}
           </aside>
+
+          {/* Floating Re-open Button when Left Sidebar is Closed */}
+          {!menuIzquierdoAbierto && (
+            <button
+              onClick={() => setMenuIzquierdoAbierto(true)}
+              title="Abrir panel de escenarios"
+              style={{
+                position: "absolute",
+                left: 10,
+                top: 70,
+                zIndex: 40,
+                backgroundColor: "rgba(14, 20, 26, 0.95)",
+                border: `1px solid ${COLOR_PRIMARY}`,
+                color: COLOR_PRIMARY,
+                padding: "8px 12px",
+                borderRadius: 4,
+                cursor: "pointer",
+                fontWeight: "bold",
+                fontSize: 11,
+                boxShadow: "0 4px 14px rgba(0,0,0,0.6)",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              <span>▶ ESCENARIOS</span>
+            </button>
+          )}
 
           {/* Center Column: GIS Map Topology Viewport (flex-1) */}
           <main style={{ flex: 1, display: "flex", flexDirection: "column", backgroundColor: COLOR_BG, position: "relative", overflow: "hidden" }}>
