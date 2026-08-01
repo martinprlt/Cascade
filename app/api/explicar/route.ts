@@ -6,8 +6,9 @@ import type { DatosCascade, ResultadoSimulacion } from "../../../lib/types";
 
 export const dynamic = "force-dynamic";
 
-const TIMEOUT_MS = 2500;
-const MODELO_LLM = "gpt-4o-mini";
+const TIMEOUT_MS = 3000;
+const MODELO_GROQ = "llama-3.3-70b-versatile";
+const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 type Fuente = "deterministico" | "ia";
 
@@ -72,38 +73,44 @@ function construirPrompt(escenarioId: string, resultado: ResultadoSimulacion, du
     `Barrios sin servicio (${m.usuariosSinServicio} usuarios): ${sinServicio.join(", ") || "ninguno"}.`,
     `Barrios con baja presion (${m.usuariosBajaPresion} usuarios): ${bajaPresion.join(", ") || "ninguno"}.`,
     `Duracion: ${duracionHoras} h. Deficit estimado: ${m.deficitM3} m3. Camiones requeridos: ${m.camionesRequeridos}. Costo de mitigacion: $ ${m.costoMitigacionARS.toLocaleString("es-AR")}.`,
-    "Explica en 3 a 5 oraciones en espanol rioplatense, sin inventar datos: que fallo, que barrios se ven afectados y como se mitiga.",
+    "Explica en máximo 2 a 3 oraciones breves en español rioplatense, sin inventar datos: qué falló, barrios afectados y mitigación.",
   ].join("\n");
 }
 
-async function explicacionLLM(escenarioId: string, resultado: ResultadoSimulacion, duracionHoras: number): Promise<string> {
+async function explicacionLLM(
+  escenarioId: string,
+  resultado: ResultadoSimulacion,
+  duracionHoras: number,
+  apiKey: string
+): Promise<string> {
   const controlador = new AbortController();
   const temporizador = setTimeout(() => controlador.abort(), TIMEOUT_MS);
   try {
-    const respuesta = await fetch("https://api.openai.com/v1/chat/completions", {
+    const respuesta = await fetch(GROQ_API_URL, {
       method: "POST",
       signal: controlador.signal,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: MODELO_LLM,
-        temperature: 0.3,
+        model: MODELO_GROQ,
+        temperature: 0.2,
+        max_tokens: 200,
         messages: [
           {
             role: "system",
             content:
-              "Sos el explicador de CASCADE, un simulador determinista de fallas en la red de agua de La Rioja. Tu unica tarea es redactar en lenguaje natural el resultado que se te pasa; jamas inventes datos, barrios ni numeros.",
+              "Sos el explicador técnico de CASCADE (red de agua de La Rioja). Redacta en 2-3 oraciones directas sin preámbulos ni saludos. No inventes números ni barrios.",
           },
           { role: "user", content: construirPrompt(escenarioId, resultado, duracionHoras) },
         ],
       }),
     });
-    if (!respuesta.ok) throw new Error(`LLM HTTP ${respuesta.status}`);
+    if (!respuesta.ok) throw new Error(`Groq LLM HTTP ${respuesta.status}`);
     const json = (await respuesta.json()) as { choices?: Array<{ message?: { content?: string } }> };
     const texto = json.choices?.[0]?.message?.content?.trim();
-    if (!texto) throw new Error("LLM devolvio contenido vacio");
+    if (!texto) throw new Error("Groq LLM devolvió contenido vacío");
     return texto;
   } finally {
     clearTimeout(temporizador);
@@ -126,11 +133,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: `Escenario inexistente: ${validado.escenarioId}` }, { status: 404 });
     }
 
-    if (process.env.OPENAI_API_KEY) {
+    const apiKey = process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY;
+    if (apiKey) {
       try {
-        const explicacion = await explicacionLLM(validado.escenarioId, validado.resultado, validado.duracionHoras);
-        return NextResponse.json({ explicacion, fuente: "ia" as Fuente });
-      } catch {
+        const explicacion = await explicacionLLM(
+          validado.escenarioId,
+          validado.resultado,
+          validado.duracionHoras,
+          apiKey
+        );
+        return NextResponse.json({ explicacion, fuente: "ia" as Fuente, modelo: MODELO_GROQ });
+      } catch (err) {
+        // Fallback a motor determinístico si la llamada IA falla
       }
     }
 

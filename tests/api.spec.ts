@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { POST as simularHandler } from "../app/api/simular/route";
 import { POST as rankingHandler } from "../app/api/ranking/route";
+import { POST as explicarHandler } from "../app/api/explicar/route";
 import { GET as redHandler } from "../app/api/red/route";
 import { GET as validacionHandler } from "../app/api/validacion/route";
 
@@ -65,4 +66,25 @@ describe("API Routes Integration Tests", () => {
     const data = await res.json();
     expect(data.recallPromedio).toBe(1.0);
   });
+
+  it("POST /api/explicar devuelve una explicación formateada y fuente válida", async () => {
+    const simReq = new Request("http://localhost/api/simular", {
+      method: "POST",
+      body: JSON.stringify({ escenarioId: "esc-01" }),
+    });
+    const simRes = await simularHandler(simReq);
+    const simData = await simRes.json();
+
+    const req = new Request("http://localhost/api/explicar", {
+      method: "POST",
+      body: JSON.stringify({ escenarioId: "esc-01", resultado: simData }),
+    });
+    const res = await explicarHandler(req);
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.explicacion).toBeDefined();
+    expect(typeof data.explicacion).toBe("string");
+    expect(["ia", "deterministico"]).toContain(data.fuente);
+  });
 });
+

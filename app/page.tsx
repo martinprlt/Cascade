@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import NetworkView from "../components/NetworkView";
+import ExplanationPanel from "../components/ExplanationPanel";
 import type {
   Arista,
   Nodo,
@@ -32,11 +33,13 @@ interface RespuestaRanking {
 interface Explicacion {
   texto: string;
   fuente: "deterministico" | "ia";
+  modelo?: string;
 }
 
 interface RespuestaExplicar {
   explicacion?: string;
   fuente?: "deterministico" | "ia";
+  modelo?: string;
 }
 
 const COLOR_NORMAL = "#12B76A";
@@ -158,7 +161,11 @@ export default function Home() {
         });
         const cuerpo = (await resExplicar.json()) as RespuestaExplicar;
         if (typeof cuerpo.explicacion === "string") {
-          setExplicacion({ texto: cuerpo.explicacion, fuente: cuerpo.fuente === "ia" ? "ia" : "deterministico" });
+          setExplicacion({
+            texto: cuerpo.explicacion,
+            fuente: cuerpo.fuente === "ia" ? "ia" : "deterministico",
+            modelo: cuerpo.modelo,
+          });
         } else {
           setExplicacion({ texto: r.explicacion, fuente: "deterministico" });
         }
@@ -507,40 +514,12 @@ export default function Home() {
           {/* Bottom Grid Row: Technical Explanation & Historical Validation */}
           <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 16 }}>
             {/* Technical Explanation Card */}
-            <div style={{ backgroundColor: COLOR_CARD, border: `1px solid ${COLOR_BORDER}`, borderRadius: 4, display: "flex", flexDirection: "column" }}>
-              <div
-                style={{
-                  padding: "12px 16px",
-                  borderBottom: `1px solid ${COLOR_BORDER}`,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  backgroundColor: "#1a2026",
-                }}
-              >
-                <h2 style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: "#E2E8F0" }}>
-                  EXPLICACIÓN TÉCNICA
-                </h2>
-                <span
-                  style={{
-                    backgroundColor: explicacion?.fuente === "ia" ? "rgba(99, 102, 241, 0.2)" : "rgba(81, 223, 142, 0.2)",
-                    color: explicacion?.fuente === "ia" ? "#A5B4FC" : COLOR_PRIMARY,
-                    fontSize: 10,
-                    fontWeight: "bold",
-                    padding: "2px 8px",
-                    borderRadius: 2,
-                    border: `1px solid ${explicacion?.fuente === "ia" ? "rgba(99, 102, 241, 0.4)" : "rgba(81, 223, 142, 0.4)"}`,
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  {explicando ? "COMPUTANDO..." : explicacion?.fuente === "ia" ? "IA GENERATIVA" : "DETERMINÍSTICO"}
-                </span>
-              </div>
-
-              <div style={{ padding: 20, flex: 1 }}>
-                <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: "#dde3eb" }}>{textoExplicacion}</p>
-              </div>
-            </div>
+            <ExplanationPanel
+              texto={textoExplicacion}
+              fuente={explicacion?.fuente ?? "deterministico"}
+              cargando={explicando}
+              modelo={explicacion?.modelo}
+            />
 
             {/* Historical Validation Card */}
             <div style={{ backgroundColor: COLOR_CARD, border: `1px solid ${COLOR_BORDER}`, borderRadius: 4, display: "flex", flexDirection: "column" }}>
