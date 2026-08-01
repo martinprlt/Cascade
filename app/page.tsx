@@ -333,21 +333,21 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
 
   return (
     <div style={{ backgroundColor: COLOR_BG, height: "100vh", width: "100vw", maxHeight: "100vh", display: "flex", flexDirection: "column", overflow: "hidden", color: "#E2E8F0", fontFamily: "'Inter', sans-serif" }}>
-      {/* Header Navigation Bar (52px height) */}
+      {/* Header Navigation Bar (60px height) */}
       <header
         style={{
-          height: 52,
+          height: 60,
           backgroundColor: "rgba(14, 20, 26, 0.98)",
           borderBottom: `1px solid ${COLOR_BORDER}`,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: "0 16px",
+          padding: "0 20px",
           flexShrink: 0,
           zIndex: 50,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           {/* Toggle Left Sidebar Button */}
           <button
             onClick={() => setMenuIzquierdoAbierto(!menuIzquierdoAbierto)}
@@ -356,25 +356,25 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
               backgroundColor: "rgba(81, 223, 142, 0.12)",
               border: `1px solid ${COLOR_PRIMARY}`,
               color: COLOR_PRIMARY,
-              padding: "4px 8px",
+              padding: "6px 12px",
               borderRadius: 4,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: 4,
-              fontSize: 11,
+              gap: 6,
+              fontSize: 11.5,
               fontWeight: 800,
             }}
           >
             {menuIzquierdoAbierto ? "◀ OCULTAR PANEL" : "▶ VER ESCENARIOS"}
           </button>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <img
               src="/CASCADE.png"
               alt="CASCADE Logo"
               style={{
-                height: 32,
+                height: 38,
                 width: "auto",
                 objectFit: "contain",
                 borderRadius: 4,
@@ -382,22 +382,22 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
               }}
             />
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <span style={{ fontSize: 16, fontWeight: 900, color: COLOR_PRIMARY, letterSpacing: "-0.03em", lineHeight: 1 }}>
+              <span style={{ fontSize: 18, fontWeight: 900, color: COLOR_PRIMARY, letterSpacing: "-0.03em", lineHeight: 1 }}>
                 CASCADE WATER SIM
               </span>
-              <span style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>La Rioja Capital | Twin Digital</span>
+              <span style={{ fontSize: 10, color: "#64748B", fontWeight: 700, marginTop: 2 }}>La Rioja Capital | Twin Digital</span>
             </div>
           </div>
           
-          <nav style={{ display: "flex", gap: 12, fontSize: 12, fontWeight: "bold", marginLeft: 8 }}>
+          <nav style={{ display: "flex", gap: 16, fontSize: 13, fontWeight: "bold", marginLeft: 12 }}>
             <button
               onClick={() => setTabActiva("mapa")}
               style={{
                 background: "none",
                 border: "none",
                 color: tabActiva === "mapa" ? COLOR_PRIMARY : "#bccabc",
-                borderBottom: tabActiva === "mapa" ? `2px solid ${COLOR_PRIMARY}` : "2px solid transparent",
-                padding: "14px 6px 12px",
+                borderBottom: tabActiva === "mapa" ? `2.5px solid ${COLOR_PRIMARY}` : "2.5px solid transparent",
+                padding: "18px 8px 14px",
                 cursor: "pointer",
               }}
             >
@@ -409,8 +409,8 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                 background: "none",
                 border: "none",
                 color: tabActiva === "escenarios" ? COLOR_PRIMARY : "#bccabc",
-                borderBottom: tabActiva === "escenarios" ? `2px solid ${COLOR_PRIMARY}` : "2px solid transparent",
-                padding: "14px 6px 12px",
+                borderBottom: tabActiva === "escenarios" ? `2.5px solid ${COLOR_PRIMARY}` : "2.5px solid transparent",
+                padding: "18px 8px 14px",
                 cursor: "pointer",
               }}
             >
@@ -422,8 +422,8 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                 background: "none",
                 border: "none",
                 color: tabActiva === "validacion" ? COLOR_PRIMARY : "#bccabc",
-                borderBottom: tabActiva === "validacion" ? `2px solid ${COLOR_PRIMARY}` : "2px solid transparent",
-                padding: "14px 6px 12px",
+                borderBottom: tabActiva === "validacion" ? `2.5px solid ${COLOR_PRIMARY}` : "2.5px solid transparent",
+                padding: "18px 8px 14px",
                 cursor: "pointer",
               }}
             >
@@ -432,10 +432,10 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
           </nav>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {/* Time Horizon Selector Buttons */}
-          <div style={{ display: "flex", alignItems: "center", backgroundColor: "#161C22", border: "1px solid #334155", borderRadius: 4, padding: 2 }}>
-            <span style={{ fontSize: 9, fontWeight: "bold", color: "#bccabc", margin: "0 4px" }}>VENTANA:</span>
+          <div style={{ display: "flex", alignItems: "center", backgroundColor: "#161C22", border: "1px solid #334155", borderRadius: 4, padding: 3 }}>
+            <span style={{ fontSize: 10, fontWeight: "bold", color: "#bccabc", margin: "0 6px" }}>VENTANA:</span>
             {[12, 24, 48, 72].map((h) => (
               <button
                 key={h}
@@ -451,8 +451,8 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                   backgroundColor: duracionHoras === h ? COLOR_PRIMARY : "transparent",
                   color: duracionHoras === h ? "#00391d" : "#E2E8F0",
                   border: "none",
-                  padding: "3px 6px",
-                  fontSize: 10,
+                  padding: "4px 8px",
+                  fontSize: 11,
                   fontWeight: "bold",
                   borderRadius: 2,
                   cursor: "pointer",
@@ -470,14 +470,14 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
               backgroundColor: "rgba(81, 223, 142, 0.15)",
               border: `1px solid ${COLOR_PRIMARY}`,
               color: COLOR_PRIMARY,
-              padding: "5px 10px",
-              fontSize: 10,
+              padding: "6px 12px",
+              fontSize: 11,
               fontWeight: 800,
               borderRadius: 4,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: 4,
+              gap: 5,
             }}
           >
             📥 INFORME OFICIAL
@@ -487,9 +487,9 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
             style={{
               backgroundColor: "rgba(81, 223, 142, 0.1)",
               border: "1px solid rgba(81, 223, 142, 0.3)",
-              padding: "3px 8px",
+              padding: "4px 10px",
               borderRadius: 4,
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 700,
               color: COLOR_PRIMARY,
               fontFamily: "monospace",
@@ -502,7 +502,7 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
 
       {/* TAB 1: Main Integrated 3-Column Viewport (NO Page Scrollbar) */}
       {tabActiva === "mapa" && (
-        <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative", height: "calc(100vh - 52px)" }}>
+        <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative", height: "calc(100vh - 60px)" }}>
           {/* Left Column: Collapsible Control Center & Scenario Selector (300px <-> 0px) */}
           <aside
             style={{
