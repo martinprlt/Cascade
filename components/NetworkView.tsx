@@ -11,8 +11,8 @@ export interface NetworkViewProps {
   onSimularCustom?: (mutaciones: Mutacion[], nombreCustom: string) => void;
 }
 
-const ANCHO = 1000;
-const ALTO = 680;
+const ANCHO = 1600;
+const ALTO = 1000;
 
 const COLORES_SEVERIDAD: Record<Severidad, string> = {
   sin_servicio: "#D92D20",
@@ -72,79 +72,91 @@ const INFO_TIPO_NODO: Record<
 };
 
 const POSICIONES: Record<string, { x: number; y: number }> = {
-  "acu-dique-los-sauces": { x: 40, y: 40 },
-  "planta-padercitas": { x: 80, y: 70 },
-  "valvula-padercitas": { x: 120, y: 110 },
-  "acu-sanagasta": { x: 160, y: 80 },
-  "valvula-sanagasta": { x: 230, y: 80 },
-  "tanque-oeste": { x: 210, y: 170 },
-  "barrio-faldeo-del-velasco": { x: 310, y: 180 },
-  "dist-oeste": { x: 210, y: 290 },
-  "perf-plaza-pesebre": { x: 50, y: 180 },
-  "perf-cochangasta": { x: 50, y: 230 },
-  "perf-unlar": { x: 50, y: 280 },
-  "perf-colegio-medico": { x: 50, y: 330 },
-  "perf-b-municipal": { x: 50, y: 380 },
-  "perf-circunvalacion": { x: 50, y: 430 },
-  "perf-parque-ciudad": { x: 50, y: 480 },
-  "valvula-rama-alta": { x: 330, y: 120 },
-  "barrio-san-nicolas": { x: 430, y: 90 },
-  "barrio-don-bosco": { x: 430, y: 160 },
-  "barrio-vargas": { x: 440, y: 220 },
-  "perf-vargas": { x: 380, y: 270 },
-  "valvula-dist-centro": { x: 380, y: 320 },
-  "barrio-centro": { x: 330, y: 250 },
-  "tanque-central": { x: 450, y: 350 },
-  "valvula-este": { x: 600, y: 320 },
-  "acu-zona-este": { x: 740, y: 320 },
-  "dist-este": { x: 870, y: 320 },
-  "barrio-yacampis": { x: 930, y: 230 },
-  "barrio-la-rodadera": { x: 930, y: 320 },
-  "barrio-centro-comercial": { x: 930, y: 410 },
-  "perf-parque-industrial": { x: 840, y: 450 },
-  "barrio-parque-industrial": { x: 930, y: 480 },
-  "dist-sur": { x: 540, y: 470 },
-  "bomba-sur": { x: 660, y: 470 },
-  "valvula-cactus": { x: 540, y: 540 },
-  "perf-copegraf": { x: 70, y: 590 },
-  "perf-lawn-tenis": { x: 170, y: 590 },
-  "perf-las-talas": { x: 270, y: 590 },
-  "perf-parque-familia": { x: 370, y: 590 },
-  "perf-los-cactus": { x: 470, y: 590 },
-  "barrio-procrear": { x: 470, y: 645 },
-  "barrio-nk-alta": { x: 550, y: 645 },
-  "barrio-las-talas-alta": { x: 630, y: 645 },
-  "barrio-virgen-de-guadalupe": { x: 660, y: 645 },
-  "barrio-luis-vernet": { x: 740, y: 530 },
-  "barrio-el-mirador": { x: 820, y: 530 },
-  "barrio-coop-santa-rosa": { x: 900, y: 530 },
-  "barrio-susana-quintela": { x: 740, y: 590 },
-  "barrio-rivadavia": { x: 820, y: 590 },
-  "barrio-emp-telecom": { x: 900, y: 590 },
-  "barrio-circunvalacion": { x: 740, y: 645 },
-  "barrio-nueva-esperanza": { x: 820, y: 645 },
-  "barrio-san-cayetano": { x: 900, y: 645 },
-  "valvula-inter-sur-oeste": { x: 370, y: 390 },
-  "valvula-inter-sur-este": { x: 495, y: 410 },
+  // Oeste (Sanagasta & Las Padercitas)
+  "acu-dique-los-sauces": { x: 80, y: 70 },
+  "planta-padercitas": { x: 160, y: 110 },
+  "valvula-padercitas": { x: 250, y: 150 },
+  "acu-sanagasta": { x: 320, y: 110 },
+  "valvula-sanagasta": { x: 410, y: 110 },
+  "tanque-oeste": { x: 350, y: 240 },
+  "barrio-faldeo-del-velasco": { x: 500, y: 260 },
+  "dist-oeste": { x: 350, y: 420 },
+
+  "perf-plaza-pesebre": { x: 80, y: 220 },
+  "perf-cochangasta": { x: 80, y: 290 },
+  "perf-unlar": { x: 80, y: 360 },
+  "perf-colegio-medico": { x: 80, y: 430 },
+  "perf-b-municipal": { x: 80, y: 500 },
+  "perf-circunvalacion": { x: 80, y: 570 },
+  "perf-parque-ciudad": { x: 80, y: 640 },
+
+  "valvula-rama-alta": { x: 520, y: 160 },
+  "barrio-san-nicolas": { x: 670, y: 120 },
+  "barrio-don-bosco": { x: 670, y: 220 },
+
+  // Centro
+  "barrio-vargas": { x: 680, y: 320 },
+  "perf-vargas": { x: 580, y: 390 },
+  "valvula-dist-centro": { x: 580, y: 460 },
+  "barrio-centro": { x: 520, y: 360 },
+  "tanque-central": { x: 700, y: 500 },
+
+  // Este
+  "valvula-este": { x: 920, y: 460 },
+  "acu-zona-este": { x: 1140, y: 460 },
+  "dist-este": { x: 1360, y: 460 },
+  "barrio-yacampis": { x: 1480, y: 320 },
+  "barrio-la-rodadera": { x: 1480, y: 460 },
+  "barrio-centro-comercial": { x: 1480, y: 600 },
+  "perf-parque-industrial": { x: 1300, y: 640 },
+  "barrio-parque-industrial": { x: 1480, y: 680 },
+
+  // Interconexiones
+  "valvula-inter-sur-oeste": { x: 580, y: 570 },
+  "valvula-inter-sur-este": { x: 780, y: 590 },
+
+  // Sur
+  "dist-sur": { x: 850, y: 700 },
+  "bomba-sur": { x: 1050, y: 700 },
+  "valvula-cactus": { x: 850, y: 800 },
+  "perf-copegraf": { x: 100, y: 880 },
+  "perf-lawn-tenis": { x: 250, y: 880 },
+  "perf-las-talas": { x: 400, y: 880 },
+  "perf-parque-familia": { x: 550, y: 880 },
+  "perf-los-cactus": { x: 700, y: 880 },
+
+  "barrio-procrear": { x: 700, y: 950 },
+  "barrio-nk-alta": { x: 830, y: 950 },
+  "barrio-las-talas-alta": { x: 960, y: 950 },
+  "barrio-virgen-de-guadalupe": { x: 1050, y: 950 },
+  "barrio-luis-vernet": { x: 1180, y: 790 },
+  "barrio-el-mirador": { x: 1300, y: 790 },
+  "barrio-coop-santa-rosa": { x: 1420, y: 790 },
+  "barrio-susana-quintela": { x: 1180, y: 880 },
+  "barrio-rivadavia": { x: 1300, y: 880 },
+  "barrio-emp-telecom": { x: 1420, y: 880 },
+  "barrio-circunvalacion": { x: 1180, y: 950 },
+  "barrio-nueva-esperanza": { x: 1300, y: 950 },
+  "barrio-san-cayetano": { x: 1420, y: 950 },
 };
 
 const ZONAS: Array<{ zona: string; x: number; y: number; w: number; h: number }> = [
-  { zona: "OESTE (Sanagasta & Las Padercitas)", x: 20, y: 20, w: 440, h: 480 },
-  { zona: "CENTRO (Vargas & Urbano)", x: 300, y: 210, w: 170, h: 170 },
-  { zona: "ESTE (Acueducto & Parque Industrial)", x: 580, y: 200, w: 390, h: 300 },
-  { zona: "SUR (Perforaciones & Los Cactus)", x: 30, y: 440, w: 940, h: 235 },
+  { zona: "OESTE (Sanagasta & Las Padercitas)", x: 30, y: 30, w: 600, h: 650 },
+  { zona: "CENTRO (Vargas & Urbano)", x: 480, y: 280, w: 320, h: 300 },
+  { zona: "ESTE (Acueducto & Parque Industrial)", x: 880, y: 260, w: 680, h: 460 },
+  { zona: "SUR (Perforaciones & Los Cactus)", x: 30, y: 740, w: 1530, h: 240 },
 ];
 
 function posicionNodo(nodo: Nodo): { x: number; y: number } {
   const fija = POSICIONES[nodo.id];
   if (fija) return fija;
   const porZona: Record<string, { x: number; y: number }> = {
-    oeste: { x: 200, y: 300 },
-    sur: { x: 500, y: 560 },
-    este: { x: 800, y: 320 },
-    centro: { x: 400, y: 300 },
+    oeste: { x: 300, y: 400 },
+    sur: { x: 800, y: 850 },
+    este: { x: 1200, y: 500 },
+    centro: { x: 600, y: 400 },
   };
-  return porZona[nodo.zona] ?? { x: 500, y: 340 };
+  return porZona[nodo.zona] ?? { x: 800, y: 500 };
 }
 
 function etiquetaCorta(nombre: string): string {
@@ -163,8 +175,15 @@ export default function NetworkView({
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [is3D, setIs3D] = useState<boolean>(false);
+
+  // Selected Node State
   const [nodoSeleccionado, setNodoSeleccionado] = useState<Nodo | null>(null);
   const [accionSimulada, setAccionSimulada] = useState<"falla" | "cierre" | "apertura">("falla");
+
+  // Draggable Card State
+  const [cardPos, setCardPos] = useState<{ x: number; y: number }>({ x: 100, y: 70 });
+  const [isCardDragging, setIsCardDragging] = useState<boolean>(false);
+  const [cardDragStart, setCardDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -175,24 +194,36 @@ export default function NetworkView({
   }, [pan]);
 
   const handleMouseMove = useCallback((e: MouseEvent<HTMLDivElement>) => {
-    if (!isDragging) return;
-    setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
-  }, [isDragging, dragStart]);
+    if (isCardDragging) {
+      setCardPos({ x: e.clientX - cardDragStart.x, y: e.clientY - cardDragStart.y });
+      return;
+    }
+    if (isDragging) {
+      setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
+    }
+  }, [isCardDragging, cardDragStart, isDragging, dragStart]);
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
+    setIsCardDragging(false);
   }, []);
 
   const handleWheel = useCallback((e: WheelEvent<HTMLDivElement>) => {
     e.preventDefault();
     const factor = e.deltaY < 0 ? 1.08 : 0.92;
-    setZoom((prevZoom) => Math.min(Math.max(prevZoom * factor, 0.6), 3.0));
+    setZoom((prevZoom) => Math.min(Math.max(prevZoom * factor, 0.5), 3.0));
   }, []);
 
   const resetView = useCallback(() => {
     setPan({ x: 0, y: 0 });
     setZoom(1.0);
   }, []);
+
+  const handleCardHeaderMouseDown = (e: MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setIsCardDragging(true);
+    setCardDragStart({ x: e.clientX - cardPos.x, y: e.clientY - cardPos.y });
+  };
 
   const ejecutarSimulacionNodo = (nodo: Nodo, accion: "falla" | "cierre" | "apertura") => {
     if (!onSimularCustom) return;
@@ -305,7 +336,7 @@ export default function NetworkView({
           }}
         >
           <span style={{ width: 7, height: 7, backgroundColor: "#51df8e", borderRadius: "50%", display: "inline-block" }}></span>
-          SYSTEM: LA_RIOJA_GIS_OVERLAY (54 NODOS)
+          SYSTEM: LA_RIOJA_AMP_MAP (1600x1000 Canvas)
         </div>
 
         {/* Node Type Legend */}
@@ -323,7 +354,7 @@ export default function NetworkView({
             <span>Acueducto</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.tanque }}>tanque</span>
+            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.tanque }}>water_full</span>
             <span>Tanque</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -371,7 +402,7 @@ export default function NetworkView({
           +
         </button>
         <button
-          onClick={() => setZoom((z) => Math.max(z * 0.8, 0.6))}
+          onClick={() => setZoom((z) => Math.max(z * 0.8, 0.5))}
           style={{ backgroundColor: "#1a2026", color: "#E2E8F0", border: "1px solid #334155", width: 28, height: 28, fontSize: 16, fontWeight: "bold", cursor: "pointer", borderRadius: 2 }}
         >
           -
@@ -384,33 +415,53 @@ export default function NetworkView({
         </button>
       </div>
 
-      {/* Interactive Node Inspector Card - Repositioned cleanly in Top-Right Corner */}
+      {/* DRAGGABLE Node Inspector Card Drawer - Moveable anywhere on screen */}
       {nodoSeleccionado && (
         <div
           style={{
-            position: "absolute",
-            top: 56,
-            right: 16,
-            zIndex: 40,
-            backgroundColor: "rgba(14, 20, 26, 0.96)",
-            border: `1px solid ${COLOR_NODO_BASE[nodoSeleccionado.tipo]}`,
+            position: "fixed",
+            left: cardPos.x,
+            top: cardPos.y,
+            zIndex: 100,
+            backgroundColor: "rgba(14, 20, 26, 0.98)",
+            border: `2px solid ${COLOR_NODO_BASE[nodoSeleccionado.tipo]}`,
             padding: 16,
-            borderRadius: 6,
-            width: 320,
+            borderRadius: 8,
+            width: 340,
             color: "#E2E8F0",
             fontSize: 12,
-            boxShadow: "0 12px 32px rgba(0,0,0,0.85)",
-            backdropFilter: "blur(12px)",
+            boxShadow: "0 16px 40px rgba(0,0,0,0.9)",
+            backdropFilter: "blur(16px)",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, borderBottom: "1px solid #1E293B", paddingBottom: 6 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          {/* Draggable Header Title Bar */}
+          <div
+            onMouseDown={handleCardHeaderMouseDown}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 10,
+              borderBottom: "1px solid #1E293B",
+              paddingBottom: 8,
+              cursor: isCardDragging ? "grabbing" : "grab",
+              backgroundColor: "rgba(22, 28, 34, 0.8)",
+              margin: "-16px -16px 12px -16px",
+              padding: "12px 16px 10px 16px",
+              borderTopLeftRadius: 6,
+              borderTopRightRadius: 6,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span className="material-symbols-outlined" style={{ fontSize: 18, color: COLOR_NODO_BASE[nodoSeleccionado.tipo] }}>
                 {INFO_TIPO_NODO[nodoSeleccionado.tipo]?.iconoMaterial}
               </span>
               <span style={{ fontWeight: 900, fontSize: 14, color: "#E2E8F0" }}>{nodoSeleccionado.nombre}</span>
             </div>
-            <button onClick={() => setNodoSeleccionado(null)} style={{ background: "none", border: "none", color: "#94A3B8", cursor: "pointer", fontSize: 16 }}>✕</button>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 10, color: "#64748B", fontWeight: "bold" }}>ARRASTRAR 🖐</span>
+              <button onClick={() => setNodoSeleccionado(null)} style={{ background: "none", border: "none", color: "#94A3B8", cursor: "pointer", fontSize: 16 }}>✕</button>
+            </div>
           </div>
 
           <div style={{ fontSize: 11, color: COLOR_NODO_BASE[nodoSeleccionado.tipo], fontWeight: "bold", marginBottom: 4 }}>
@@ -510,7 +561,7 @@ export default function NetworkView({
         </div>
       )}
 
-      {/* Main Vector Map SVG Plane */}
+      {/* Main Vector Map SVG Plane (1600 x 1000 Canvas) */}
       <div
         style={{
           width: "100%",
@@ -539,50 +590,50 @@ export default function NetworkView({
             {/* Base Background */}
             <rect width={ANCHO} height={ALTO} fill="#0B1220" />
 
-            {/* Urban Street Network Lines */}
+            {/* Expanded Urban Street Network Lines (1600x1000) */}
             <g stroke="#1E293B" strokeWidth="1" opacity="0.6">
-              <line x1={0} y1={150} x2={ANCHO} y2={150} stroke="#334155" strokeWidth={12} />
-              <line x1={0} y1={300} x2={ANCHO} y2={300} stroke="#334155" strokeWidth={10} />
-              <line x1={0} y1={470} x2={ANCHO} y2={470} stroke="#334155" strokeWidth={14} />
-              <line x1={200} y1={0} x2={200} y2={ALTO} stroke="#334155" strokeWidth={10} />
-              <line x1={600} y1={0} x2={600} y2={ALTO} stroke="#334155" strokeWidth={12} />
+              <line x1={0} y1={200} x2={ANCHO} y2={200} stroke="#334155" strokeWidth={14} />
+              <line x1={0} y1={460} x2={ANCHO} y2={460} stroke="#334155" strokeWidth={14} />
+              <line x1={0} y1={720} x2={ANCHO} y2={720} stroke="#334155" strokeWidth={16} />
+              <line x1={350} y1={0} x2={350} y2={ALTO} stroke="#334155" strokeWidth={12} />
+              <line x1={900} y1={0} x2={900} y2={ALTO} stroke="#334155" strokeWidth={14} />
             </g>
 
             {/* Residential Blocks */}
             <g fill="#161C22" stroke="#1E293B" strokeWidth="1">
-              <rect x={70} y={160} width={40} height={30} rx={2} />
-              <rect x={120} y={160} width={40} height={30} rx={2} />
-              <rect x={70} y={200} width={40} height={30} rx={2} />
-              <rect x={120} y={200} width={40} height={30} rx={2} />
-              <rect x={620} y={160} width={50} height={40} rx={2} />
-              <rect x={680} y={160} width={50} height={40} rx={2} />
-              <rect x={640} y={490} width={45} height={35} rx={2} />
-              <rect x={695} y={490} width={45} height={35} rx={2} />
+              <rect x={120} y={220} width={80} height={50} rx={3} />
+              <rect x={220} y={220} width={80} height={50} rx={3} />
+              <rect x={120} y={300} width={80} height={50} rx={3} />
+              <rect x={220} y={300} width={80} height={50} rx={3} />
+              <rect x={940} y={220} width={90} height={60} rx={3} />
+              <rect x={1050} y={220} width={90} height={60} rx={3} />
+              <rect x={940} y={750} width={80} height={50} rx={3} />
+              <rect x={1040} y={750} width={80} height={50} rx={3} />
             </g>
 
             {/* 3D Shadows */}
             {is3D && (
               <g fill="#1E293B" opacity="0.8">
-                <polygon points="70,190 110,190 110,198 70,198" />
-                <polygon points="120,190 160,190 160,198 120,198" />
-                <polygon points="620,200 670,200 670,210 620,210" />
+                <polygon points="120,270 200,270 200,282 120,282" />
+                <polygon points="220,270 300,270 300,282 220,282" />
+                <polygon points="940,280 1030,280 1030,295 940,295" />
               </g>
             )}
 
             {/* Street Labels */}
-            <g fill="#64748B" fontFamily="Inter" fontSize="10" fontWeight="bold" letterSpacing="0.1em">
-              <text x={30} y={142}>AV. SANAGASTA / RAMÍREZ DE VELASCO</text>
-              <text x={30} y={292}>CALLE BAZÁN Y BUSTOS</text>
-              <text x={30} y={462}>AV. LOS CACTUS / AV. CIRCUNVALACIÓN</text>
-              <text transform="rotate(90, 190, 40)" x={190} y={40}>AV. FACUNDO QUIROGA</text>
-              <text transform="rotate(90, 590, 40)" x={590} y={40}>AV. ORTIZ DE OCAMPO</text>
+            <g fill="#64748B" fontFamily="Inter" fontSize="11" fontWeight="bold" letterSpacing="0.1em">
+              <text x={40} y={188}>AV. SANAGASTA / RAMÍREZ DE VELASCO</text>
+              <text x={40} y={448}>CALLE BAZÁN Y BUSTOS</text>
+              <text x={40} y={708}>AV. LOS CACTUS / AV. CIRCUNVALACIÓN</text>
+              <text transform="rotate(90, 340, 50)" x={340} y={50}>AV. FACUNDO QUIROGA</text>
+              <text transform="rotate(90, 890, 50)" x={890} y={50}>AV. ORTIZ DE OCAMPO</text>
             </g>
 
             {/* Zones */}
             {ZONAS.map((z) => (
               <g key={z.zona}>
                 <rect x={z.x} y={z.y} width={z.w} height={z.h} fill="#161C22" opacity={0.35} rx={4} stroke="#1E293B" strokeWidth={1} />
-                <text x={z.x + 10} y={z.y + 18} fontSize={10} fontWeight="bold" fill="#51df8e" letterSpacing={2}>
+                <text x={z.x + 12} y={z.y + 22} fontSize={11} fontWeight="bold" fill="#51df8e" letterSpacing={2}>
                   SECTOR {z.zona}
                 </text>
               </g>
@@ -603,8 +654,8 @@ export default function NetworkView({
                   x2={fHasta.x}
                   y2={fHasta.y}
                   stroke={colorArista}
-                  strokeWidth={cerrada ? 1.5 : 2.5}
-                  strokeDasharray={cerrada ? "4 4" : undefined}
+                  strokeWidth={cerrada ? 1.8 : 3}
+                  strokeDasharray={cerrada ? "5 5" : undefined}
                   opacity={cerrada ? 0.4 : 0.85}
                   markerEnd={cerrada ? undefined : "url(#flecha)"}
                 />
@@ -631,14 +682,14 @@ export default function NetworkView({
                   {is3D && <ellipse cx={p.x} cy={p.y + 14} rx={14} ry={7} fill="#000000" opacity={0.6} />}
 
                   {sev === "sin_servicio" && (
-                    <circle cx={p.x} cy={p.y} r={22} fill="none" stroke="#D92D20" strokeWidth={1.5} opacity={0.75}>
-                      <animate attributeName="r" values="14;26;14" dur="2s" repeatCount="indefinite" />
+                    <circle cx={p.x} cy={p.y} r={24} fill="none" stroke="#D92D20" strokeWidth={1.5} opacity={0.75}>
+                      <animate attributeName="r" values="14;28;14" dur="2s" repeatCount="indefinite" />
                       <animate attributeName="opacity" values="0.9;0.2;0.9" dur="2s" repeatCount="indefinite" />
                     </circle>
                   )}
                   {sev === "baja_presion" && (
-                    <circle cx={p.x} cy={p.y} r={18} fill="none" stroke="#F79009" strokeWidth={1} opacity={0.5}>
-                      <animate attributeName="r" values="12;20;12" dur="3s" repeatCount="indefinite" />
+                    <circle cx={p.x} cy={p.y} r={20} fill="none" stroke="#F79009" strokeWidth={1} opacity={0.5}>
+                      <animate attributeName="r" values="12;22;12" dur="3s" repeatCount="indefinite" />
                     </circle>
                   )}
 
@@ -649,9 +700,9 @@ export default function NetworkView({
                   {etiquetas && n.tipo === "barrio" && (
                     <text
                       x={p.x}
-                      y={p.y + 26}
+                      y={p.y + 28}
                       textAnchor="middle"
-                      fontSize={10}
+                      fontSize={11}
                       fontWeight="bold"
                       fill="#E2E8F0"
                       style={{ userSelect: "none", pointerEvents: "none" }}
