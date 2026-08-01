@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, type JSX, type MouseEvent, type WheelEvent } from "react";
+import { useState, useRef, useCallback, type MouseEvent, type WheelEvent } from "react";
 import type { Arista, Nodo, Severidad } from "../lib/types";
 
 export interface NetworkViewProps {
@@ -99,7 +99,6 @@ function etiquetaCorta(nombre: string): string {
 }
 
 export default function NetworkView({ nodos, aristas, severidad, etiquetas = true }: NetworkViewProps) {
-  // Pan and Zoom Interactive State
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState<number>(1.0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -126,7 +125,7 @@ export default function NetworkView({ nodos, aristas, severidad, etiquetas = tru
 
   const handleWheel = useCallback((e: WheelEvent<HTMLDivElement>) => {
     e.preventDefault();
-    const factor = e.deltaY < 0 ? 1.1 : 0.9;
+    const factor = e.deltaY < 0 ? 1.08 : 0.92;
     setZoom((prevZoom) => Math.min(Math.max(prevZoom * factor, 0.6), 3.0));
   }, []);
 
@@ -147,9 +146,8 @@ export default function NetworkView({ nodos, aristas, severidad, etiquetas = tru
         position: "relative",
         width: "100%",
         height: "100%",
-        minHeight: 480,
+        flex: 1,
         backgroundColor: "#0B1220",
-        borderRadius: 4,
         overflow: "hidden",
         cursor: isDragging ? "grabbing" : "grab",
         userSelect: "none",
@@ -184,7 +182,7 @@ export default function NetworkView({ nodos, aristas, severidad, etiquetas = tru
           }}
         >
           <span style={{ width: 7, height: 7, backgroundColor: "#51df8e", borderRadius: "50%", display: "inline-block" }}></span>
-          SYSTEM: LA_RIOJA_GIS_OVERLAY_3D
+          SYSTEM: LA_RIOJA_GIS_OVERLAY
         </div>
         <div style={{ background: "rgba(14,20,26,0.92)", border: "1px solid #3d4a3f", padding: "4px 10px", fontSize: 10, fontFamily: "monospace", color: "#bccabc", borderRadius: 2 }}>
           LAT: -29.412 | LON: -66.855 | ZOOM: {(zoom * 100).toFixed(0)}%
@@ -238,7 +236,7 @@ export default function NetworkView({ nodos, aristas, severidad, etiquetas = tru
         </button>
       </div>
 
-      {/* Selected Node Details Card Tooltip */}
+      {/* Selected Node Details Tooltip Card */}
       {nodoSeleccionado && (
         <div
           style={{
@@ -267,167 +265,159 @@ export default function NetworkView({ nodos, aristas, severidad, etiquetas = tru
         </div>
       )}
 
-      {/* Main Map Rendering Plane */}
+      {/* Main Vector Map SVG Plane */}
       <div
         style={{
-          transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) ${is3D ? "rotateX(50deg) rotateZ(-15deg)" : ""}`,
-          transformOrigin: "center center",
-          transition: isDragging ? "none" : "transform 0.2s cubic-bezier(0.25, 1, 0.5, 1)",
-          width: ANCHO,
-          height: ALTO,
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <svg viewBox={`0 0 ${ANCHO} ${ALTO}`} style={{ width: ANCHO, height: ALTO, display: "block" }}>
-          <defs>
-            <marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#12B76A" />
-            </marker>
-          </defs>
+        <div
+          style={{
+            transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) ${is3D ? "rotateX(48deg) rotateZ(-12deg)" : ""}`,
+            transformOrigin: "center center",
+            transition: isDragging ? "none" : "transform 0.15s ease-out",
+            width: ANCHO,
+            height: ALTO,
+          }}
+        >
+          <svg viewBox={`0 0 ${ANCHO} ${ALTO}`} style={{ width: ANCHO, height: ALTO, display: "block" }}>
+            <defs>
+              <marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#12B76A" />
+              </marker>
+            </defs>
 
-          {/* Background Vector Map Base */}
-          <rect width={ANCHO} height={ALTO} fill="#0B1220" />
+            {/* Base Background */}
+            <rect width={ANCHO} height={ALTO} fill="#0B1220" />
 
-          {/* Urban Street Grid & Blocks (Google Maps Style Urban Grid) */}
-          <g stroke="#1E293B" strokeWidth="1" opacity="0.6">
-            {/* Major Avenues of La Rioja Capital */}
-            <line x1={0} y1={150} x2={ANCHO} y2={150} stroke="#334155" strokeWidth={12} />
-            <line x1={0} y1={300} x2={ANCHO} y2={300} stroke="#334155" strokeWidth={10} />
-            <line x1={0} y1={470} x2={ANCHO} y2={470} stroke="#334155" strokeWidth={14} />
-            <line x1={200} y1={0} x2={200} y2={ALTO} stroke="#334155" strokeWidth={10} />
-            <line x1={600} y1={0} x2={600} y2={ALTO} stroke="#334155" strokeWidth={12} />
-          </g>
-
-          {/* Residential Building Blocks (3D Extrusions when 3D Mode is active) */}
-          <g fill="#161C22" stroke="#1E293B" strokeWidth="1">
-            {/* Sector Oeste Residential Blocks */}
-            <rect x={70} y={160} width={40} height={30} rx={2} />
-            <rect x={120} y={160} width={40} height={30} rx={2} />
-            <rect x={70} y={200} width={40} height={30} rx={2} />
-            <rect x={120} y={200} width={40} height={30} rx={2} />
-            <rect x={70} y={240} width={40} height={30} rx={2} />
-            <rect x={120} y={240} width={40} height={30} rx={2} />
-
-            {/* Sector Este Residential Blocks */}
-            <rect x={620} y={160} width={50} height={40} rx={2} />
-            <rect x={680} y={160} width={50} height={40} rx={2} />
-            <rect x={620} y={210} width={50} height={40} rx={2} />
-            <rect x={680} y={210} width={50} height={40} rx={2} />
-
-            {/* Sector Sur Residential Blocks */}
-            <rect x={640} y={490} width={45} height={35} rx={2} />
-            <rect x={695} y={490} width={45} height={35} rx={2} />
-            <rect x={750} y={490} width={45} height={35} rx={2} />
-            <rect x={640} y={540} width={45} height={35} rx={2} />
-            <rect x={695} y={540} width={45} height={35} rx={2} />
-            <rect x={750} y={540} width={45} height={35} rx={2} />
-          </g>
-
-          {/* 3D Extrusion Side Shadows if 3D Mode is ON */}
-          {is3D && (
-            <g fill="#1E293B" opacity="0.8">
-              <polygon points="70,190 110,190 110,198 70,198" />
-              <polygon points="120,190 160,190 160,198 120,198" />
-              <polygon points="620,200 670,200 670,210 620,210" />
-              <polygon points="640,525 685,525 685,535 640,535" />
+            {/* Urban Street Network Lines */}
+            <g stroke="#1E293B" strokeWidth="1" opacity="0.6">
+              <line x1={0} y1={150} x2={ANCHO} y2={150} stroke="#334155" strokeWidth={12} />
+              <line x1={0} y1={300} x2={ANCHO} y2={300} stroke="#334155" strokeWidth={10} />
+              <line x1={0} y1={470} x2={ANCHO} y2={470} stroke="#334155" strokeWidth={14} />
+              <line x1={200} y1={0} x2={200} y2={ALTO} stroke="#334155" strokeWidth={10} />
+              <line x1={600} y1={0} x2={600} y2={ALTO} stroke="#334155" strokeWidth={12} />
             </g>
-          )}
 
-          {/* Street Labels (Google Maps Style) */}
-          <g fill="#64748B" fontFamily="Inter" fontSize="10" fontWeight="bold" letterSpacing="0.1em">
-            <text x={30} y={142}>AV. SANAGASTA / RAMÍREZ DE VELASCO</text>
-            <text x={30} y={292}>CALLE BAZÁN Y BUSTOS</text>
-            <text x={30} y={462}>AV. LOS CACTUS / AV. CIRCUNVALACIÓN</text>
-            <text transform="rotate(90, 190, 40)" x={190} y={40}>AV. FACUNDO QUIROGA</text>
-            <text transform="rotate(90, 590, 40)" x={590} y={40}>AV. ORTIZ DE OCAMPO</text>
-          </g>
-
-          {/* Zone Outlines */}
-          {ZONAS.map((z) => (
-            <g key={z.zona}>
-              <rect x={z.x} y={z.y} width={z.w} height={z.h} fill="#161C22" opacity={0.35} rx={4} stroke="#1E293B" strokeWidth={1} />
-              <text x={z.x + 10} y={z.y + 18} fontSize={10} fontWeight="bold" fill="#51df8e" letterSpacing={2}>
-                SECTOR {z.zona}
-              </text>
+            {/* Residential Blocks */}
+            <g fill="#161C22" stroke="#1E293B" strokeWidth="1">
+              <rect x={70} y={160} width={40} height={30} rx={2} />
+              <rect x={120} y={160} width={40} height={30} rx={2} />
+              <rect x={70} y={200} width={40} height={30} rx={2} />
+              <rect x={120} y={200} width={40} height={30} rx={2} />
+              <rect x={620} y={160} width={50} height={40} rx={2} />
+              <rect x={680} y={160} width={50} height={40} rx={2} />
+              <rect x={640} y={490} width={45} height={35} rx={2} />
+              <rect x={695} y={490} width={45} height={35} rx={2} />
             </g>
-          ))}
 
-          {/* Pipelines */}
-          {aristas.map((a, i) => {
-            const fDesde = POSICIONES[a.from];
-            const fHasta = POSICIONES[a.to];
-            if (!fDesde || !fHasta) return null;
-            const cerrada = a.estado === "cerrada";
-            const colorArista = cerrada ? "#475569" : "#12B76A";
-            return (
-              <line
-                key={i}
-                x1={fDesde.x}
-                y1={fDesde.y}
-                x2={fHasta.x}
-                y2={fHasta.y}
-                stroke={colorArista}
-                strokeWidth={cerrada ? 1.5 : 2.5}
-                strokeDasharray={cerrada ? "4 4" : undefined}
-                opacity={cerrada ? 0.4 : 0.85}
-                markerEnd={cerrada ? undefined : "url(#flecha)"}
-              />
-            );
-          })}
-
-          {/* Nodes */}
-          {nodos.map((n) => {
-            const p = posicionNodo(n);
-            const sev = severidad?.[n.id];
-            const fill =
-              n.estado === "fallado" ? "#D92D20" : sev ? COLORES_SEVERIDAD[sev] : COLOR_NODO_BASE[n.tipo] ?? "#94A3B8";
-            const contorno = "#E2E8F0";
-
-            return (
-              <g
-                key={n.id}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setNodoSeleccionado(n);
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                {/* 3D Node Drop Shadow */}
-                {is3D && <ellipse cx={p.x} cy={p.y + 12} rx={12} ry={6} fill="#000000" opacity={0.6} />}
-
-                {/* Severity Pulse Animations */}
-                {sev === "sin_servicio" && (
-                  <circle cx={p.x} cy={p.y} r={20} fill="none" stroke="#D92D20" strokeWidth={1.5} opacity={0.7}>
-                    <animate attributeName="r" values="12;24;12" dur="2s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite" />
-                  </circle>
-                )}
-                {sev === "baja_presion" && (
-                  <circle cx={p.x} cy={p.y} r={16} fill="none" stroke="#F79009" strokeWidth={1} opacity={0.5}>
-                    <animate attributeName="r" values="11;18;11" dur="3s" repeatCount="indefinite" />
-                  </circle>
-                )}
-
-                {/* Node Shape */}
-                <circle cx={p.x} cy={p.y} r={n.tipo === "barrio" ? 11 : 8} fill={fill} stroke={contorno} strokeWidth={1.5} />
-
-                <title>{n.nombre}</title>
-                {etiquetas && n.tipo === "barrio" && (
-                  <text
-                    x={p.x}
-                    y={p.y + 24}
-                    textAnchor="middle"
-                    fontSize={10}
-                    fontWeight="bold"
-                    fill="#E2E8F0"
-                    style={{ userSelect: "none", pointerEvents: "none" }}
-                  >
-                    {etiquetaCorta(n.nombre)}
-                  </text>
-                )}
+            {/* 3D Shadows */}
+            {is3D && (
+              <g fill="#1E293B" opacity="0.8">
+                <polygon points="70,190 110,190 110,198 70,198" />
+                <polygon points="120,190 160,190 160,198 120,198" />
+                <polygon points="620,200 670,200 670,210 620,210" />
               </g>
-            );
-          })}
-        </svg>
+            )}
+
+            {/* Street Labels */}
+            <g fill="#64748B" fontFamily="Inter" fontSize="10" fontWeight="bold" letterSpacing="0.1em">
+              <text x={30} y={142}>AV. SANAGASTA / RAMÍREZ DE VELASCO</text>
+              <text x={30} y={292}>CALLE BAZÁN Y BUSTOS</text>
+              <text x={30} y={462}>AV. LOS CACTUS / AV. CIRCUNVALACIÓN</text>
+              <text transform="rotate(90, 190, 40)" x={190} y={40}>AV. FACUNDO QUIROGA</text>
+              <text transform="rotate(90, 590, 40)" x={590} y={40}>AV. ORTIZ DE OCAMPO</text>
+            </g>
+
+            {/* Zones */}
+            {ZONAS.map((z) => (
+              <g key={z.zona}>
+                <rect x={z.x} y={z.y} width={z.w} height={z.h} fill="#161C22" opacity={0.35} rx={4} stroke="#1E293B" strokeWidth={1} />
+                <text x={z.x + 10} y={z.y + 18} fontSize={10} fontWeight="bold" fill="#51df8e" letterSpacing={2}>
+                  SECTOR {z.zona}
+                </text>
+              </g>
+            ))}
+
+            {/* Pipelines */}
+            {aristas.map((a, i) => {
+              const fDesde = POSICIONES[a.from];
+              const fHasta = POSICIONES[a.to];
+              if (!fDesde || !fHasta) return null;
+              const cerrada = a.estado === "cerrada";
+              const colorArista = cerrada ? "#475569" : "#12B76A";
+              return (
+                <line
+                  key={i}
+                  x1={fDesde.x}
+                  y1={fDesde.y}
+                  x2={fHasta.x}
+                  y2={fHasta.y}
+                  stroke={colorArista}
+                  strokeWidth={cerrada ? 1.5 : 2.5}
+                  strokeDasharray={cerrada ? "4 4" : undefined}
+                  opacity={cerrada ? 0.4 : 0.85}
+                  markerEnd={cerrada ? undefined : "url(#flecha)"}
+                />
+              );
+            })}
+
+            {/* Nodes */}
+            {nodos.map((n) => {
+              const p = posicionNodo(n);
+              const sev = severidad?.[n.id];
+              const fill =
+                n.estado === "fallado" ? "#D92D20" : sev ? COLORES_SEVERIDAD[sev] : COLOR_NODO_BASE[n.tipo] ?? "#94A3B8";
+              const contorno = "#E2E8F0";
+
+              return (
+                <g
+                  key={n.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setNodoSeleccionado(n);
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  {is3D && <ellipse cx={p.x} cy={p.y + 12} rx={12} ry={6} fill="#000000" opacity={0.6} />}
+
+                  {sev === "sin_servicio" && (
+                    <circle cx={p.x} cy={p.y} r={20} fill="none" stroke="#D92D20" strokeWidth={1.5} opacity={0.7}>
+                      <animate attributeName="r" values="12;24;12" dur="2s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite" />
+                    </circle>
+                  )}
+                  {sev === "baja_presion" && (
+                    <circle cx={p.x} cy={p.y} r={16} fill="none" stroke="#F79009" strokeWidth={1} opacity={0.5}>
+                      <animate attributeName="r" values="11;18;11" dur="3s" repeatCount="indefinite" />
+                    </circle>
+                  )}
+
+                  <circle cx={p.x} cy={p.y} r={n.tipo === "barrio" ? 11 : 8} fill={fill} stroke={contorno} strokeWidth={1.5} />
+
+                  <title>{n.nombre}</title>
+                  {etiquetas && n.tipo === "barrio" && (
+                    <text
+                      x={p.x}
+                      y={p.y + 24}
+                      textAnchor="middle"
+                      fontSize={10}
+                      fontWeight="bold"
+                      fill="#E2E8F0"
+                      style={{ userSelect: "none", pointerEvents: "none" }}
+                    >
+                      {etiquetaCorta(n.nombre)}
+                    </text>
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+        </div>
       </div>
     </div>
   );

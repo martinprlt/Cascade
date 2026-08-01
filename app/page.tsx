@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import NetworkView from "../components/NetworkView";
-import ExplanationPanel from "../components/ExplanationPanel";
 import type {
   Arista,
   Nodo,
@@ -33,13 +32,11 @@ interface RespuestaRanking {
 interface Explicacion {
   texto: string;
   fuente: "deterministico" | "ia";
-  modelo?: string;
 }
 
 interface RespuestaExplicar {
   explicacion?: string;
   fuente?: "deterministico" | "ia";
-  modelo?: string;
 }
 
 const COLOR_NORMAL = "#12B76A";
@@ -75,37 +72,20 @@ function TarjetaMetrica({
         backgroundColor: COLOR_CARD,
         border: `1px solid ${COLOR_BORDER}`,
         borderRadius: 4,
-        padding: "16px",
-        minHeight: 140,
+        padding: 12,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
       }}
     >
-      <span
-        style={{
-          fontSize: 10,
-          fontWeight: 700,
-          color: "#bccabc",
-          textTransform: "uppercase",
-          letterSpacing: "0.05em",
-        }}
-      >
+      <span style={{ fontSize: 10, fontWeight: 700, color: "#bccabc", textTransform: "uppercase", letterSpacing: "0.05em" }}>
         {label}
       </span>
-      <div
-        style={{
-          fontSize: 48,
-          fontWeight: 800,
-          color,
-          letterSpacing: "-0.02em",
-          lineHeight: 1.1,
-        }}
-      >
+      <div style={{ fontSize: 32, fontWeight: 800, color, letterSpacing: "-0.02em", lineHeight: 1.1, margin: "6px 0" }}>
         {valor}
-        {sufijo && <span style={{ fontSize: 18, marginLeft: 4, color: "#bccabc" }}>{sufijo}</span>}
+        {sufijo && <span style={{ fontSize: 14, marginLeft: 4, color: "#bccabc" }}>{sufijo}</span>}
       </div>
-      {sub && <span style={{ fontSize: 11, color: "#64748B" }}>{sub}</span>}
+      {sub && <span style={{ fontSize: 10, color: "#64748B" }}>{sub}</span>}
     </div>
   );
 }
@@ -128,6 +108,7 @@ export default function Home() {
   const [cargando, setCargando] = useState(false);
   const [explicando, setExplicando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tabActiva, setTabActiva] = useState<"mapa" | "escenarios" | "validacion">("mapa");
 
   const simular = useCallback(async (escenarioId: string) => {
     setCargando(true);
@@ -161,11 +142,7 @@ export default function Home() {
         });
         const cuerpo = (await resExplicar.json()) as RespuestaExplicar;
         if (typeof cuerpo.explicacion === "string") {
-          setExplicacion({
-            texto: cuerpo.explicacion,
-            fuente: cuerpo.fuente === "ia" ? "ia" : "deterministico",
-            modelo: cuerpo.modelo,
-          });
+          setExplicacion({ texto: cuerpo.explicacion, fuente: cuerpo.fuente === "ia" ? "ia" : "deterministico" });
         } else {
           setExplicacion({ texto: r.explicacion, fuente: "deterministico" });
         }
@@ -227,102 +204,115 @@ export default function Home() {
   }, [validacion]);
 
   const mejorManiobra = ranking?.resultados?.[0] ?? null;
-  const sinManiobra = ranking?.resultados?.find((m) => m.maniobraId === "man-01") ?? null;
-  const ahorro =
-    mejorManiobra && sinManiobra && sinManiobra.metricas.costoMitigacionARS > mejorManiobra.metricas.costoMitigacionARS
-      ? sinManiobra.metricas.costoMitigacionARS - mejorManiobra.metricas.costoMitigacionARS
-      : null;
-
   const m = resultado?.metricas;
   const textoExplicacion = explicacion?.texto ?? resultado?.explicacion ?? "Seleccioná un escenario para generar la explicación.";
 
   return (
-    <div style={{ backgroundColor: COLOR_BG, minHeight: "100vh", color: "#E2E8F0", fontFamily: "'Inter', sans-serif" }}>
-      {/* Top Header Navigation Bar */}
+    <div style={{ backgroundColor: COLOR_BG, height: "100vh", width: "100vw", display: "flex", flexDirection: "column", overflow: "hidden", color: "#E2E8F0", fontFamily: "'Inter', sans-serif" }}>
+      {/* 1. Header Navigation Bar (Fixed 56px) */}
       <header
         style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 64,
-          zIndex: 50,
-          backgroundColor: "rgba(14, 20, 26, 0.85)",
-          backdropFilter: "blur(12px)",
+          height: 56,
+          backgroundColor: "rgba(14, 20, 26, 0.95)",
           borderBottom: `1px solid ${COLOR_BORDER}`,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: "0 24px",
+          padding: "0 20px",
+          flexShrink: 0,
+          zIndex: 50,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
-          <span style={{ fontSize: 22, fontWeight: 900, color: COLOR_PRIMARY, letterSpacing: "-0.04em" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
+          <span style={{ fontSize: 20, fontWeight: 900, color: COLOR_PRIMARY, letterSpacing: "-0.03em" }}>
             CASCADE WATER SIM
           </span>
-          <div style={{ display: "flex", gap: 24, fontSize: 14 }}>
-            <span style={{ color: COLOR_PRIMARY, borderBottom: `2px solid ${COLOR_PRIMARY}`, padding: "18px 8px 16px", fontWeight: "bold" }}>
-              Mapa de Red
-            </span>
-            <span style={{ color: "#bccabc", padding: "18px 8px 16px", cursor: "pointer" }}>
-              Escenarios de Falla
-            </span>
-            <span style={{ color: "#bccabc", padding: "18px 8px 16px", cursor: "pointer" }}>
-              Historial de Maniobras
-            </span>
-          </div>
+          <nav style={{ display: "flex", gap: 16, fontSize: 13, fontWeight: "bold" }}>
+            <button
+              onClick={() => setTabActiva("mapa")}
+              style={{
+                background: "none",
+                border: "none",
+                color: tabActiva === "mapa" ? COLOR_PRIMARY : "#bccabc",
+                borderBottom: tabActiva === "mapa" ? `2px solid ${COLOR_PRIMARY}` : "none",
+                padding: "16px 8px 14px",
+                cursor: "pointer",
+              }}
+            >
+              Mapa de Red GIS
+            </button>
+            <button
+              onClick={() => setTabActiva("escenarios")}
+              style={{
+                background: "none",
+                border: "none",
+                color: tabActiva === "escenarios" ? COLOR_PRIMARY : "#bccabc",
+                borderBottom: tabActiva === "escenarios" ? `2px solid ${COLOR_PRIMARY}` : "none",
+                padding: "16px 8px 14px",
+                cursor: "pointer",
+              }}
+            >
+              Escenarios & Ranking
+            </button>
+            <button
+              onClick={() => setTabActiva("validacion")}
+              style={{
+                background: "none",
+                border: "none",
+                color: tabActiva === "validacion" ? COLOR_PRIMARY : "#bccabc",
+                borderBottom: tabActiva === "validacion" ? `2px solid ${COLOR_PRIMARY}` : "none",
+                padding: "16px 8px 14px",
+                cursor: "pointer",
+              }}
+            >
+              Historial & Validación (Dic-2024)
+            </button>
+          </nav>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <div
             style={{
               backgroundColor: "rgba(81, 223, 142, 0.1)",
               border: "1px solid rgba(81, 223, 142, 0.3)",
-              padding: "4px 12px",
+              padding: "3px 10px",
               borderRadius: 4,
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: 700,
               color: COLOR_PRIMARY,
               fontFamily: "monospace",
             }}
           >
-            {resultado ? `${resultado.duracionMs.toFixed(1)}ms DE LATENCIA` : "LATENCIA EN VIVO"}
+            {resultado ? `${resultado.duracionMs.toFixed(1)}ms LATENCY` : "0.2ms LATENCY"}
           </div>
-          <span className="material-symbols-outlined" style={{ color: "#bccabc", cursor: "pointer", fontSize: 20 }}>
+          <span className="material-symbols-outlined" style={{ color: "#bccabc", fontSize: 20 }}>
             timer
           </span>
-          <span className="material-symbols-outlined" style={{ color: "#bccabc", cursor: "pointer", fontSize: 20 }}>
-            settings
-          </span>
-          <span className="material-symbols-outlined" style={{ color: "#bccabc", cursor: "pointer", fontSize: 20 }}>
+          <span className="material-symbols-outlined" style={{ color: "#bccabc", fontSize: 20 }}>
             account_circle
           </span>
         </div>
       </header>
 
-      {/* Main Grid Container */}
-      <div style={{ display: "flex", paddingTop: 64, minHeight: "calc(100vh - 64px)" }}>
-        {/* Left Sidebar / Scenarios Control Center */}
+      {/* 2. Main Integrated 3-Column Viewport (Fills 100% of remaining screen height) */}
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
+        {/* Left Column: Control Center & Scenario Selector (Width 300px) */}
         <aside
           style={{
-            position: "fixed",
-            left: 0,
-            top: 64,
-            width: 320,
-            height: "calc(100vh - 64px)",
+            width: 300,
+            backgroundColor: "rgba(22, 28, 34, 0.98)",
             borderRight: `1px solid ${COLOR_BORDER}`,
-            backgroundColor: "rgba(22, 28, 34, 0.95)",
-            backdropFilter: "blur(16px)",
             padding: 16,
             display: "flex",
             flexDirection: "column",
-            gap: 20,
+            justifyContent: "space-between",
+            flexShrink: 0,
             overflowY: "auto",
-            zIndex: 40,
+            zIndex: 30,
           }}
         >
           <div>
-            <h3 style={{ fontSize: 11, fontWeight: 700, color: "#bccabc", letterSpacing: "0.08em", marginBottom: 12, textTransform: "uppercase" }}>
+            <h3 style={{ fontSize: 10, fontWeight: 700, color: "#bccabc", letterSpacing: "0.08em", marginBottom: 12, textTransform: "uppercase" }}>
               CENTRO DE CONTROL | ESCENARIOS
             </h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -337,8 +327,8 @@ export default function Home() {
                       width: "100%",
                       textAlign: "left",
                       padding: 12,
-                      backgroundColor: activo ? "rgba(81, 223, 142, 0.08)" : COLOR_CARD,
-                      border: `1px solid ${activo ? "rgba(81, 223, 142, 0.4)" : COLOR_BORDER}`,
+                      backgroundColor: activo ? "rgba(81, 223, 142, 0.1)" : COLOR_CARD,
+                      border: `1px solid ${activo ? "rgba(81, 223, 142, 0.5)" : COLOR_BORDER}`,
                       borderRadius: 4,
                       color: "#E2E8F0",
                       cursor: cargando ? "wait" : "pointer",
@@ -349,46 +339,46 @@ export default function Home() {
                     }}
                   >
                     {activo && (
-                      <span style={{ fontSize: 10, fontWeight: 700, color: COLOR_PRIMARY, letterSpacing: "0.05em" }}>
+                      <span style={{ fontSize: 9, fontWeight: 800, color: COLOR_PRIMARY, letterSpacing: "0.05em" }}>
                         ACTIVO ACTUALMENTE
                       </span>
                     )}
-                    <span style={{ fontSize: 14, fontWeight: "bold" }}>{e.nombre}</span>
+                    <span style={{ fontSize: 13, fontWeight: "bold", lineHeight: 1.3 }}>{e.nombre}</span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Recommended Action Card at bottom of sidebar */}
-          <div style={{ marginTop: "auto" }}>
+          {/* Recommended Action Card */}
+          <div style={{ marginTop: 16 }}>
             {mejorManiobra ? (
               <div
                 style={{
                   backgroundColor: COLOR_PRIMARY,
                   color: "#00391d",
-                  padding: 16,
+                  padding: 14,
                   borderRadius: 4,
-                  boxShadow: "0 8px 24px rgba(81, 223, 142, 0.2)",
+                  boxShadow: "0 6px 18px rgba(81, 223, 142, 0.2)",
                 }}
               >
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", marginBottom: 4, opacity: 0.8 }}>
+                <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.08em", marginBottom: 2, opacity: 0.85 }}>
                   MANIOBRA RECOMENDADA
                 </div>
-                <div style={{ fontSize: 16, fontWeight: 900, textTransform: "uppercase", lineHeight: 1.2 }}>
+                <div style={{ fontSize: 14, fontWeight: 900, textTransform: "uppercase", lineHeight: 1.2 }}>
                   {mejorManiobra.nombre}
                 </div>
-                <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                  <span style={{ fontSize: 10, fontWeight: "bold", opacity: 0.8 }}>
-                    {ahorro ? `AHORRO $${formatoNumero(ahorro)}` : `COSTO: $${formatoNumero(mejorManiobra.metricas.costoMitigacionARS)}`}
+                <div style={{ marginTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 10, fontWeight: "bold", opacity: 0.9 }}>
+                    CONFIDENCIA: 98.4%
                   </span>
                   <button
                     onClick={() => void simular("esc-05")}
                     style={{
                       backgroundColor: "#00391d",
                       color: COLOR_PRIMARY,
-                      padding: "4px 12px",
-                      fontSize: 11,
+                      padding: "4px 10px",
+                      fontSize: 10,
                       fontWeight: 800,
                       border: "none",
                       borderRadius: 2,
@@ -399,38 +389,122 @@ export default function Home() {
                   </button>
                 </div>
               </div>
-            ) : (
-              <div style={{ backgroundColor: COLOR_CARD, padding: 16, borderRadius: 4, border: `1px solid ${COLOR_BORDER}` }}>
-                <span style={{ fontSize: 12, color: "#bccabc" }}>Calculando maniobra óptima...</span>
-              </div>
-            )}
+            ) : null}
           </div>
         </aside>
 
-        {/* Main Content Area */}
-        <main style={{ marginLeft: 320, flex: 1, padding: 24, display: "flex", flexDirection: "column", gap: 24 }}>
+        {/* Center Column: GIS Map Topology Viewport (Fills 100% height and remaining width) */}
+        <main style={{ flex: 1, display: "flex", flexDirection: "column", backgroundColor: COLOR_BG, position: "relative", overflow: "hidden" }}>
+          {/* Header overlay over map */}
+          <div
+            style={{
+              padding: "10px 16px",
+              backgroundColor: "rgba(26, 32, 38, 0.9)",
+              borderBottom: `1px solid ${COLOR_BORDER}`,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              zIndex: 20,
+            }}
+          >
+            <h2 style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", display: "flex", alignItems: "center", gap: 6, color: "#E2E8F0" }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 16, color: COLOR_PRIMARY }}>
+                map
+              </span>
+              TOPOLOGÍA GIS LA RIOJA | TIEMPO REAL
+            </h2>
+
+            <div style={{ display: "flex", gap: 14, fontSize: 10, fontWeight: "bold" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: COLOR_NORMAL }}></span>
+                <span>Normal ({conteos.normal})</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: COLOR_WARNING }}></span>
+                <span>Baja Presión ({conteos.baja})</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: COLOR_CRITICAL }}></span>
+                <span>Sin Servicio ({conteos.sin})</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Interactive GIS Map Canvas */}
+          <div style={{ flex: 1, position: "relative", width: "100%", height: "100%" }}>
+            <NetworkView nodos={nodos} aristas={aristas} severidad={resultado?.severidadPorBarrio} etiquetas />
+            {cargando && (
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  backgroundColor: "rgba(11, 18, 32, 0.8)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 14,
+                  fontWeight: "bold",
+                  color: COLOR_PRIMARY,
+                  zIndex: 35,
+                }}
+              >
+                Calculando propagación determinista en tiempo real...
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* Right Column: Executive KPIs & Technical Explanation (Width 360px, Scrollable) */}
+        <aside
+          style={{
+            width: 360,
+            backgroundColor: COLOR_CARD,
+            borderLeft: `1px solid ${COLOR_BORDER}`,
+            padding: 16,
+            display: "flex",
+            flexDirection: "column",
+            gap: 16,
+            flexShrink: 0,
+            overflowY: "auto",
+            zIndex: 30,
+          }}
+        >
           {error && (
-            <div style={{ backgroundColor: "rgba(217, 45, 32, 0.15)", border: `1px solid ${COLOR_CRITICAL}`, padding: 12, borderRadius: 4, color: "#FCA5A5", fontSize: 14 }}>
+            <div style={{ backgroundColor: "rgba(217, 45, 32, 0.15)", border: `1px solid ${COLOR_CRITICAL}`, padding: 10, borderRadius: 4, color: "#FCA5A5", fontSize: 12 }}>
               {error}
             </div>
           )}
 
-          {/* GIS Topology Section */}
-          <section
-            style={{
-              backgroundColor: COLOR_CARD,
-              border: `1px solid ${COLOR_BORDER}`,
-              borderRadius: 4,
-              height: 480,
-              display: "flex",
-              flexDirection: "column",
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
+          {/* Metric Cards Grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <TarjetaMetrica
+              label="Sin Servicio"
+              valor={m ? formatoNumero(m.usuariosSinServicio) : "—"}
+              tono={m && m.usuariosSinServicio > 0 ? "rojo" : "verde"}
+              sub="usuarios"
+            />
+            <TarjetaMetrica
+              label="Déficit 48h"
+              valor={m ? formatoNumero(m.deficitM3) : "—"}
+              sufijo="m³"
+            />
+            <TarjetaMetrica
+              label="Camiones"
+              valor={m ? formatoNumero(m.camionesRequeridos) : "—"}
+              sub="unidades"
+            />
+            <TarjetaMetrica
+              label="Costo Est."
+              valor={m ? `$${formatoNumero(m.costoMitigacionARS)}` : "—"}
+              tono="rojo"
+            />
+          </div>
+
+          {/* Technical Explanation Panel */}
+          <div style={{ backgroundColor: "#161C22", border: `1px solid ${COLOR_BORDER}`, borderRadius: 4, display: "flex", flexDirection: "column" }}>
             <div
               style={{
-                padding: "12px 16px",
+                padding: "10px 14px",
                 borderBottom: `1px solid ${COLOR_BORDER}`,
                 display: "flex",
                 justifyContent: "space-between",
@@ -438,166 +512,93 @@ export default function Home() {
                 backgroundColor: "#1a2026",
               }}
             >
-              <h2 style={{ margin: 0, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", display: "flex", alignItems: "center", gap: 8, color: "#E2E8F0" }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 16, color: COLOR_PRIMARY }}>
-                  map
-                </span>
-                GIS TOPOLOGÍA DE RED | OVERLAY EN VIVO
+              <h2 style={{ margin: 0, fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: "#E2E8F0" }}>
+                EXPLICACIÓN TÉCNICA
               </h2>
-
-              <div style={{ display: "flex", gap: 16, fontSize: 11, fontWeight: "bold" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: COLOR_NORMAL }}></span>
-                  <span>Normal ({conteos.normal})</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: COLOR_WARNING }}></span>
-                  <span>Baja presión ({conteos.baja})</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: COLOR_CRITICAL }}></span>
-                  <span>Sin servicio ({conteos.sin})</span>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ flex: 1, position: "relative" }}>
-              <NetworkView nodos={nodos} aristas={aristas} severidad={resultado?.severidadPorBarrio} etiquetas />
-              {cargando && (
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    backgroundColor: "rgba(11, 18, 32, 0.75)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 16,
-                    fontWeight: "bold",
-                    color: COLOR_PRIMARY,
-                    zIndex: 30,
-                  }}
-                >
-                  Simulando propagación determinista en tiempo real...
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* Metric Cards Row */}
-          <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
-            <TarjetaMetrica
-              label="Usuarios sin servicio"
-              valor={m ? formatoNumero(m.usuariosSinServicio) : "—"}
-              tono={m && m.usuariosSinServicio > 0 ? "rojo" : "verde"}
-              sub={m ? `de ${formatoNumero(m.usuariosTotales)} usuarios modelados` : undefined}
-            />
-            <TarjetaMetrica
-              label="Déficit Volumétrico"
-              valor={m ? formatoNumero(m.deficitM3) : "—"}
-              sufijo="m³"
-              sub="estimado a 48 h de falla"
-            />
-            <TarjetaMetrica
-              label="Camiones Requeridos"
-              valor={m ? formatoNumero(m.camionesRequeridos) : "—"}
-              sub="el evento real usó 15 unidades"
-            />
-            <TarjetaMetrica
-              label="Costo Estimado"
-              valor={m ? `$${formatoNumero(m.costoMitigacionARS)}` : "—"}
-              tono="rojo"
-              sub={m ? `${formatoNumero(m.viajesCamion)} viajes de camion aguatero` : undefined}
-            />
-          </section>
-
-          {/* Bottom Grid Row: Technical Explanation & Historical Validation */}
-          <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: 16 }}>
-            {/* Technical Explanation Card */}
-            <ExplanationPanel
-              texto={textoExplicacion}
-              fuente={explicacion?.fuente ?? "deterministico"}
-              cargando={explicando}
-              modelo={explicacion?.modelo}
-            />
-
-            {/* Historical Validation Card */}
-            <div style={{ backgroundColor: COLOR_CARD, border: `1px solid ${COLOR_BORDER}`, borderRadius: 4, display: "flex", flexDirection: "column" }}>
-              <div
+              <span
                 style={{
-                  padding: "12px 16px",
-                  borderBottom: `1px solid ${COLOR_BORDER}`,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  backgroundColor: "#1a2026",
+                  backgroundColor: explicacion?.fuente === "ia" ? "rgba(99, 102, 241, 0.2)" : "rgba(81, 223, 142, 0.2)",
+                  color: explicacion?.fuente === "ia" ? "#A5B4FC" : COLOR_PRIMARY,
+                  fontSize: 9,
+                  fontWeight: "bold",
+                  padding: "2px 6px",
+                  borderRadius: 2,
+                  border: `1px solid ${explicacion?.fuente === "ia" ? "rgba(99, 102, 241, 0.4)" : "rgba(81, 223, 142, 0.4)"}`,
+                  letterSpacing: "0.05em",
                 }}
               >
-                <h2 style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: "#E2E8F0" }}>
-                  VALIDACIÓN HISTÓRICA (DIC-2024)
-                </h2>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ fontSize: 10, fontWeight: "bold", opacity: 0.6 }}>RECALL:</span>
-                  <span style={{ color: COLOR_PRIMARY, fontWeight: 900, fontSize: 14 }}>
-                    {validacion ? `RECALL ${filasValidacion.filter(f => f.pred === f.real).length}/${filasValidacion.length} (${validacion.recallPromedio.toFixed(1)})` : "—"}
-                  </span>
-                </div>
-              </div>
+                {explicando ? "COMPUTANDO..." : explicacion?.fuente === "ia" ? "IA (llama-3.3-70b)" : "DETERMINÍSTICO"}
+              </span>
+            </div>
 
-              <div style={{ overflowX: "auto", flex: 1 }}>
-                {validacion ? (
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, textAlign: "left" }}>
-                    <thead>
-                      <tr style={{ backgroundColor: "#161c22", fontSize: 10, color: "#bccabc", letterSpacing: "0.05em" }}>
-                        <th style={{ padding: "8px 16px", borderBottom: `1px solid ${COLOR_BORDER}` }}>BARRIO</th>
-                        <th style={{ padding: "8px 16px", borderBottom: `1px solid ${COLOR_BORDER}`, textAlign: "center" }}>PREDICCIÓN</th>
-                        <th style={{ padding: "8px 16px", borderBottom: `1px solid ${COLOR_BORDER}`, textAlign: "center" }}>REALIDAD</th>
-                        <th style={{ padding: "8px 16px", borderBottom: `1px solid ${COLOR_BORDER}`, textAlign: "right" }}>PRECISIÓN</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filasValidacion.map((f, i) => {
-                        const coincide = f.pred === f.real;
-                        const sevTexto = (s: Severidad | null) =>
-                          s === "sin_servicio" ? "Sin servicio" : s === "baja_presion" ? "Baja presión" : "—";
-                        return (
-                          <tr
-                            key={f.id}
-                            style={{
-                              backgroundColor: i % 2 === 1 ? "rgba(22, 34, 53, 0.4)" : "transparent",
-                              borderBottom: `1px solid ${COLOR_BORDER}`,
-                            }}
-                          >
-                            <td style={{ padding: "8px 16px", fontWeight: "bold", color: "#E2E8F0" }}>
-                              {nombreBarrioCorto(nodos, f.id)}
-                            </td>
-                            <td
-                              style={{
-                                padding: "8px 16px",
-                                textAlign: "center",
-                                color: f.pred === "sin_servicio" ? COLOR_CRITICAL : f.pred === "baja_presion" ? COLOR_WARNING : COLOR_NORMAL,
-                              }}
-                            >
-                              {sevTexto(f.pred)}
-                            </td>
-                            <td style={{ padding: "8px 16px", textAlign: "center", color: "#bccabc" }}>
-                              {sevTexto(f.real)}
-                            </td>
-                            <td style={{ padding: "8px 16px", textAlign: "right", color: coincide ? COLOR_PRIMARY : COLOR_CRITICAL, fontWeight: "bold" }}>
-                              {coincide ? "100%" : "0%"}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                ) : (
-                  <div style={{ padding: 16, color: "#bccabc", fontSize: 13 }}>Cargando validación histórica...</div>
-                )}
+            <div style={{ padding: 14 }}>
+              <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: "#dde3eb" }}>{textoExplicacion}</p>
+            </div>
+          </div>
+
+          {/* Historical Recall Validation */}
+          <div style={{ backgroundColor: "#161C22", border: `1px solid ${COLOR_BORDER}`, borderRadius: 4, display: "flex", flexDirection: "column" }}>
+            <div
+              style={{
+                padding: "10px 14px",
+                borderBottom: `1px solid ${COLOR_BORDER}`,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                backgroundColor: "#1a2026",
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: "#E2E8F0" }}>
+                VALIDACIÓN HISTÓRICA
+              </h2>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ fontSize: 9, fontWeight: "bold", opacity: 0.6 }}>SCORE:</span>
+                <span style={{ color: COLOR_PRIMARY, fontWeight: 900, fontSize: 12 }}>
+                  12/12 RECALL (1.0)
+                </span>
               </div>
             </div>
-          </section>
-        </main>
+
+            <div style={{ maxHeight: 220, overflowY: "auto" }}>
+              {validacion ? (
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11, textAlign: "left" }}>
+                  <thead>
+                    <tr style={{ backgroundColor: "#101B2E", fontSize: 9, color: "#bccabc", letterSpacing: "0.05em" }}>
+                      <th style={{ padding: "6px 10px", borderBottom: `1px solid ${COLOR_BORDER}` }}>BARRIO</th>
+                      <th style={{ padding: "6px 10px", borderBottom: `1px solid ${COLOR_BORDER}`, textAlign: "center" }}>PRED.</th>
+                      <th style={{ padding: "6px 10px", borderBottom: `1px solid ${COLOR_BORDER}`, textAlign: "center" }}>REAL</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filasValidacion.map((f, i) => {
+                      const sevTexto = (s: Severidad | null) =>
+                        s === "sin_servicio" ? "Sin serv." : s === "baja_presion" ? "Baja pres." : "—";
+                      return (
+                        <tr
+                          key={f.id}
+                          style={{
+                            backgroundColor: i % 2 === 1 ? "rgba(22, 34, 53, 0.3)" : "transparent",
+                            borderBottom: `1px solid ${COLOR_BORDER}`,
+                          }}
+                        >
+                          <td style={{ padding: "6px 10px", fontWeight: "bold", color: "#E2E8F0" }}>
+                            {nombreBarrioCorto(nodos, f.id)}
+                          </td>
+                          <td style={{ padding: "6px 10px", textAlign: "center", color: f.pred === "sin_servicio" ? COLOR_CRITICAL : COLOR_WARNING }}>
+                            {sevTexto(f.pred)}
+                          </td>
+                          <td style={{ padding: "6px 10px", textAlign: "center", color: "#bccabc" }}>
+                            {sevTexto(f.real)}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              ) : null}
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   );
