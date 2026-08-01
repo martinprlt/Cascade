@@ -1,4 +1,4 @@
-import { DatosCascade, Mutacion, ResultadoSimulacion } from "./types";
+import { DatosCascade, EstadoNodo, Mutacion, ResultadoSimulacion } from "./types";
 import { aplicarMutaciones, redBase } from "./grafo";
 import { severidadPorBarrio } from "./motor";
 import { calcularMetricas } from "./metricas";
@@ -25,6 +25,13 @@ export function simularEscenario(
   const horas = duracionFalla(datos, duracionHoras);
   const metricas = calcularMetricas(mutada, severidad, datos.supuestos, horas);
 
+  const nodosEstado: Record<string, EstadoNodo> = {};
+  for (const n of mutada.nodos) {
+    if (n.estado !== "activo") {
+      nodosEstado[n.id] = n.estado;
+    }
+  }
+
   const nombreDeNodo = (id: string) => datos.nodos.find((n) => n.id === id)?.nombre ?? id;
   const explicacion = explicarResultado(escenario, severidad, metricas, nombreDeNodo, horas);
 
@@ -32,6 +39,7 @@ export function simularEscenario(
     escenarioId,
     escenarioNombre: escenario.nombre,
     severidadPorBarrio: severidad,
+    nodosEstado,
     metricas,
     explicacion,
     duracionMs: Number((performance.now() - inicio).toFixed(2)),
@@ -53,6 +61,13 @@ export function simularEscenarioCustom(
   const horas = duracionFalla(datos, duracionHoras);
   const metricas = calcularMetricas(mutada, severidad, datos.supuestos, horas);
 
+  const nodosEstado: Record<string, EstadoNodo> = {};
+  for (const n of mutada.nodos) {
+    if (n.estado !== "activo") {
+      nodosEstado[n.id] = n.estado;
+    }
+  }
+
   const nombreDeNodo = (id: string) => datos.nodos.find((n) => n.id === id)?.nombre ?? id;
   const escenarioFake = {
     id: "custom",
@@ -66,6 +81,7 @@ export function simularEscenarioCustom(
     escenarioId: "custom",
     escenarioNombre: nombreCustom,
     severidadPorBarrio: severidad,
+    nodosEstado,
     metricas,
     explicacion,
     duracionMs: Number((performance.now() - inicio).toFixed(2)),

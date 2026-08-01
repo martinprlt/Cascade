@@ -108,6 +108,7 @@ export interface ResultadoSimulacion {
   escenarioId: string;
   escenarioNombre: string;
   severidadPorBarrio: Record<string, Severidad>;
+  nodosEstado?: Record<string, EstadoNodo>;
   metricas: ResultadoMetricas;
   explicacion: string;
   duracionMs: number;

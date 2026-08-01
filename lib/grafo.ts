@@ -18,33 +18,45 @@ export function redBase(datos: DatosCascade): RedDeAgua {
 }
 
 export function aplicarMutaciones(red: RedDeAgua, mutaciones: Mutacion[]): void {
-  const nodos = new Map(red.nodos.map((n) => [n.id, n]));
+  const nodosMap = new Map(red.nodos.map((n) => [n.id, n]));
   for (const m of mutaciones) {
-    const nodo = nodos.get(m.nodo);
-    if (!nodo) throw new Error(`Mutacion apunta a nodo inexistente: ${m.nodo}`);
+    const nodo = nodosMap.get(m.nodo);
+    if (!nodo) throw new Error(`Mutación apunta a nodo inexistente: ${m.nodo}`);
     switch (m.accion) {
       case "falla":
         nodo.estado = "fallado";
         for (const a of red.aristas) {
-          if (a.from === m.nodo || a.to === m.nodo || a.viaValvula === m.nodo) a.estado = "cerrada";
+          if (a.from === m.nodo || a.to === m.nodo || a.viaValvula === m.nodo) {
+            a.estado = "cerrada";
+          }
         }
         break;
+
       case "cierre":
+        nodo.estado = "cerrado";
         for (const a of red.aristas) {
-          if (a.from === m.nodo || a.to === m.nodo || a.viaValvula === m.nodo) a.estado = "cerrada";
+          if (a.viaValvula === m.nodo || (a.from === m.nodo && nodo.tipo === "valvula") || (a.to === m.nodo && nodo.tipo === "valvula")) {
+            a.estado = "cerrada";
+          }
         }
         break;
+
       case "apertura":
+        nodo.estado = "activo";
         for (const a of red.aristas) {
-          if (a.from === m.nodo || a.to === m.nodo || a.viaValvula === m.nodo) a.estado = "abierta";
+          if (a.viaValvula === m.nodo || (a.from === m.nodo && nodo.tipo === "valvula") || (a.to === m.nodo && nodo.tipo === "valvula")) {
+            a.estado = "abierta";
+          }
         }
         break;
+
       case "reduccion":
         nodo.estado = "reducido";
         if (m.caudalHorarioM3 !== undefined) nodo.caudalHorarioM3 = m.caudalHorarioM3;
         break;
+
       default:
-        throw new Error(`Accion de mutacion desconocida: ${m.accion}`);
+        throw new Error(`Acción de mutación desconocida: ${(m as Mutacion).accion}`);
     }
   }
 }

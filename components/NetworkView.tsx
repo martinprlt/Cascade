@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useRef, useCallback, type JSX, type MouseEvent, type WheelEvent } from "react";
-import type { Arista, Mutacion, Nodo, Severidad, TipoNodo } from "../lib/types";
+import type { Arista, EstadoNodo, Mutacion, Nodo, Severidad, TipoNodo } from "../lib/types";
 
 export interface NetworkViewProps {
   nodos: Nodo[];
   aristas: Arista[];
   severidad?: Record<string, Severidad>;
+  nodosEstado?: Record<string, EstadoNodo>;
   etiquetas?: boolean;
   onSimularCustom?: (mutaciones: Mutacion[], nombreCustom: string) => void;
 }
@@ -167,6 +168,7 @@ export default function NetworkView({
   nodos,
   aristas,
   severidad,
+  nodosEstado,
   etiquetas = true,
   onSimularCustom,
 }: NetworkViewProps) {
@@ -679,9 +681,18 @@ export default function NetworkView({
             {nodos.map((n) => {
               const p = posicionNodo(n);
               const sev = severidad?.[n.id];
+              const estadoEspecifico = nodosEstado?.[n.id] ?? n.estado;
               const esSeleccionado = nodoSeleccionado?.id === n.id;
+
               const fill =
-                n.estado === "fallado" ? "#D92D20" : sev ? COLORES_SEVERIDAD[sev] : COLOR_NODO_BASE[n.tipo] ?? "#94A3B8";
+                estadoEspecifico === "fallado"
+                  ? "#D92D20"
+                  : estadoEspecifico === "cerrado"
+                  ? "#F79009"
+                  : sev
+                  ? COLORES_SEVERIDAD[sev]
+                  : COLOR_NODO_BASE[n.tipo] ?? "#94A3B8";
+
               const contorno = esSeleccionado ? "#51df8e" : "#E2E8F0";
 
               return (

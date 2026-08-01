@@ -403,7 +403,7 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                 onClick={() => {
                   setDuracionHoras(h);
                   if (esCustom) {
-                    // re-simular custom con nuevas horas
+                    // keep custom
                   } else {
                     void simular(seleccionado, h);
                   }
@@ -659,6 +659,7 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                 nodos={nodos}
                 aristas={aristas}
                 severidad={resultado?.severidadPorBarrio}
+                nodosEstado={resultado?.nodosEstado}
                 etiquetas
                 onSimularCustom={(mut, nom) => void simularCustom(mut, nom)}
               />
