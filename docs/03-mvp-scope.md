@@ -22,7 +22,7 @@ Regla de oro: **lo que no está en este documento, no se construye.** La demo es
 | id | Escenario | Mutaciones | Resultado esperado (48 h, supuestos estándar) |
 |---|---|---|---|
 | esc-01 | Falla perforación Av. Los Cactus (**validación**) | falla `perf-los-cactus` | 3 barrios sin servicio, 9 con baja presión; 2.880 m³ déficit; $60.000.000; **15 camiones** (real: 7 → 15); recall 1.0 |
-| esc-02 | Falla parcial acueducto Sanagasta (2.200 → 830) | reduccion `acu-sanagasta` a 830 + cierre `valvula-rama-alta` | San Nicolás y Don Bosco sin servicio (ramal alto), Centro con baja presión; 1.900 m³; $39.750.000; 10 camiones |
+| esc-02 | Falla parcial acueducto Sanagasta (2.200 → 830) | reduccion `acu-sanagasta` a 830 + cierre `valvula-rama-alta` | San Nicolás y Don Bosco sin servicio (ramal alto); Centro y sector Este (Yacampis, La Rodadera, Centro Comercial) con baja presión (pierden la fuente acueducto, conservan las perforaciones del oeste); 2.400 m³; $50.000.000; 13 camiones |
 | esc-03 | Cierre válvula sector Este | cierre `valvula-este` | Yacampis, La Rodadera, Centro Comercial sin servicio; 1.000 m³; $21.000.000; 6 camiones |
 | esc-04 | Falla perforación Las Talas | falla `perf-las-talas` | Zona sur pierde 1 de 5 fuentes → 9 barrios con baja presión; 1.720 m³; $36.000.000; 9 camiones |
 | esc-05 | Combinado + ranking de alternativas | falla `perf-los-cactus` + falla `perf-las-talas` + cierre `valvula-este` | 5.400 sin servicio, 8.600 con baja presión; 3.880 m³; $81.000.000; 21 camiones; ranking: maniobra combinada (reabrir este + interconexión sur-oeste) baja a 2.300 m³ y $48.000.000 |

@@ -9,7 +9,7 @@
   },
   "nodos": [
     { "id": "acu-sanagasta", "nombre": "Acueducto Sanagasta", "tipo": "acueducto", "zona": "oeste", "estado": "activo", "caudalHorarioM3": 2200, "fuente": "F3: Nueva Rioja 17-18/12/2024", "descripcion": "Caudal nominal 2.200 m3/h; en crisis de dic-2024 paso a 830 m3/h (perdio mas de la mitad; dique Los Sauces en bajante historica)" },
-    { "id": "acu-zona-este", "nombre": "Acueducto Zona Este", "tipo": "acueducto", "zona": "este", "estado": "activo", "caudalHorarioM3": 150, "fuente": "F6: argentina.gob.ar 2022", "supuesto": true, "descripcion": "Obra 2022: 8.000 vecinos, ~2.500 lotes, ~6 km de canerias, valvulas de desague y de aire. Caudal supuesto" },
+    { "id": "acu-zona-este", "nombre": "Acueducto Zona Este", "tipo": "acueducto", "zona": "este", "estado": "activo", "esFuente": false, "caudalHorarioM3": 150, "fuente": "F6: argentina.gob.ar 2022", "supuesto": true, "descripcion": "Obra 2022: 8.000 vecinos, ~2.500 lotes, ~6 km de canerias, valvulas de desague y de aire. No genera agua en el modelo: es un conducto alimentado por la valvula-este (esFuente=false). Caudal supuesto" },
     { "id": "perf-plaza-pesebre", "nombre": "Perforacion Plaza del Pesebre", "tipo": "perforacion", "zona": "oeste", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto (valor tipico de perforacion)" },
     { "id": "perf-cochangasta", "nombre": "Perforacion Escuela de Cochangasta", "tipo": "perforacion", "zona": "oeste", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto" },
     { "id": "perf-unlar", "nombre": "Perforacion UNLaR", "tipo": "perforacion", "zona": "oeste", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto" },
@@ -115,22 +115,22 @@
         "fuente": "F2: Nueva Rioja, 17/12/2024",
         "reporte": "Procrear, Nestor Kirchner (parte alta) y Las Talas (parte alta) sin servicio; baja presion en Luis Vernet, Susana Quintela, El Mirador, Rivadavia, Circunvalacion, Nueva Esperanza, Coop. Santa Rosa, Emp. Telecom y San Cayetano. Compensacion con maniobras desde otros sectores y camiones aguateros; ~48 hs de reparacion."
       },
-      "validacion": {
-        "estadoEsperado": {
-          "sin_servicio": ["barrio-procrear", "barrio-nk-alta", "barrio-las-talas-alta"],
-          "baja_presion": ["barrio-luis-vernet", "barrio-susana-quintela", "barrio-el-mirador", "barrio-rivadavia", "barrio-circunvalacion", "barrio-nueva-esperanza", "barrio-coop-santa-rosa", "barrio-emp-telecom", "barrio-san-cayetano"]
-        },
-        "duracionReportadaHoras": 48,
-        "metricasEsperadas": {
-          "usuariosSinServicio": 2900,
-          "usuariosBajaPresion": 8600,
-          "deficitM3": 2880,
-          "costoMitigacionARS": 60000000,
-          "camionesRequeridos": 15,
-          "camionesRealesDelEvento": 15,
-          "recallEsperado": 1.0
+        "validacion": {
+          "estadoEsperado": {
+            "sin_servicio": ["barrio-procrear", "barrio-nk-alta", "barrio-las-talas-alta"],
+            "baja_presion": ["barrio-luis-vernet", "barrio-susana-quintela", "barrio-el-mirador", "barrio-rivadavia", "barrio-circunvalacion", "barrio-nueva-esperanza", "barrio-coop-santa-rosa", "barrio-emp-telecom", "barrio-san-cayetano"]
+          },
+          "duracionReportadaHoras": 48,
+          "recallEsperado": 1.0,
+          "metricasEsperadas": {
+            "usuariosSinServicio": 2900,
+            "usuariosBajaPresion": 8600,
+            "deficitM3": 2880,
+            "costoMitigacionARS": 60000000,
+            "camionesRequeridos": 15,
+            "camionesRealesDelEvento": 15
+          }
         }
-      }
     },
     {
       "id": "esc-02",
@@ -181,7 +181,8 @@
           { "id": "man-02", "costoMitigacionARS": 68750000, "deficitM3": 3300, "camionesRequeridos": 18 },
           { "id": "man-03", "costoMitigacionARS": 68750000, "deficitM3": 3300, "camionesRequeridos": 18 },
           { "id": "man-01", "costoMitigacionARS": 81000000, "deficitM3": 3880, "camionesRequeridos": 21 }
-        ]
+        ],
+        "nota": "resultadoEsperado verificado por el motor (lib/, vitest) el 31/07/2026: man-05 (48M) vs man-01 (81M), la maniobra combinada reduce el costo de mitigacion 41%. Barrios del ramal Los Cactus servidos por interconexion cuentan como 'baja presion' (perdieron su fuente original y pasan a depender de un camino de emergencia)."
       }
     }
   ],

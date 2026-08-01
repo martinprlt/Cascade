@@ -60,7 +60,7 @@ El grafo base tiene todo activo salvo las interconexiones de emergencia (`valvul
 
 ### 3.1 Conjunto de fuentes de cada barrio — propagación inversa (BFS)
 
-Se elige **propagación inversa** (desde el barrio hacia atrás, siguiendo aristas entrantes) en lugar de propagación desde cada fuente. Justificación: los escenarios son fallas locales, los consumidores son ~18 nodos y las fuentes ~14. Propagar hacia adelante desde cada fuente obliga a recorrer todo el subárbol de la fuente aunque la falla no lo toque; la propagación inversa solo explora el universo de alimentación del barrio, cuyo tamaño no depende de dónde esté la falla. En la red de Capital ambos costos son irrelevantes (~0,2 ms); la elección importa para grafos a escala (ver §6, decisión (a)).
+Se elige **propagación inversa** (desde el barrio hacia atrás, siguiendo aristas entrantes) en lugar de propagación desde cada fuente. Justificación: los escenarios son fallas locales, los consumidores son 18 barrios y las fuentes activas son **13** (acu-sanagasta + 12 perforaciones; acu-zona-este no es fuente, es un conducto alimentado por la válvula del sector este). Propagar hacia adelante desde cada fuente obliga a recorrer todo el subárbol de la fuente aunque la falla no lo toque; la propagación inversa solo explora el universo de alimentación del barrio, cuyo tamaño no depende de dónde esté la falla. En la red de Capital ambos costos son irrelevantes (~0,2 ms); la elección importa para grafos a escala (ver §6, decisión (a)).
 
 ```pseudocode
 FUNCION fuentes(barrio, G):
@@ -71,7 +71,7 @@ FUNCION fuentes(barrio, G):
     n <- desencolar(cola)
     si n ∈ visitados: continuar
     visitados <- visitados ∪ {n}
-    si tipo(n) ∈ {perforacion, acueducto} y estado(n) = "activo":
+    si tipo(n) ∈ {perforacion, acueducto} y esFuente(n) ≠ false y estado(n) = "activo":
       fuentes <- fuentes ∪ {n}
     si no:
       para cada (f, t, e) ∈ aristasEntrantes(G, n) con e.estado = "abierta":
@@ -79,13 +79,13 @@ FUNCION fuentes(barrio, G):
   retornar fuentes
 ```
 
-Los nodos de tránsito (tanques, bombas, válvulas, distribuidores) no son fuentes: el BFS los atraviesa y sigue. El estado "reducido" de una fuente (acueducto a 830 m³/h) la excluye del conjunto: sigue existiendo en el grafo pero no cuenta como fuente activa.
+Los nodos de tránsito (tanques, bombas, válvulas, distribuidores) no son fuentes: el BFS los atraviesa y sigue. El flag `esFuente` marca los nodos que generan agua: `acu-zona-este` es un acueducto **alimentado** (esFuente=false), no produce — en el modelo recibe por la válvula del sector este, por eso su cierre deja al sector sin servicio. El estado "reducido" de una fuente (acueducto a 830 m³/h) la excluye del conjunto: sigue existiendo en el grafo pero no cuenta como fuente activa.
 
 ### 3.2 Mutaciones de escenario
 
 | Acción | Efecto sobre el grafo | Uso |
 |---|---|---|
-| `falla` | Elimina el nodo y todas sus aristas incidentes | Perforación fuera de servicio (Los Cactus, Las Talas) |
+| `falla` | Marca el nodo como `fallado` y cierra todas sus aristas incidentes (incluidas las referidas por `viaValvula`) | Perforación fuera de servicio (Los Cactus, Las Talas) |
 | `cierre` | Marca `cerradas` las aristas de la válvula | Corte de válvula (sector este, ramal zona alta) |
 | `apertura` | Marca `abiertas` las aristas de la válvula | Maniobra de mitigación (interconexiones de emergencia) |
 | `reduccion` | Estado `reducido` en la fuente (caudal nuevo, no cuenta como activa) | Acueducto Sanagasta 2.200 → 830 m³/h |
@@ -129,11 +129,11 @@ severidadAgregada = (usuariosSinServicio + 0,5 × usuariosBajaPresion) / usuario
 
 ### 3.6 Complejidad computacional
 
-- BFS por barrio: **O(V+E)**.
-- Escenario (todos los barrios): **O(V+E)** — la cantidad de barrios es una constante del modelo.
-- Ranking: **K × O(V+E)**, K ≤ 10.
+- BFS por barrio: **O(V+E)** con listas de adyacencia. La implementación actual (escaneo lineal de aristas por nodo expandido) es **O(V·E)** en el peor caso teórico.
+- Escenario (todos los barrios): la cantidad de barrios es una constante del modelo (18) → en la práctica un escenario completo corre en ~0,2 ms.
+- Ranking: **K × costo de escenario**, K ≤ 10 → simulación completa con ranking < 5 ms en la red modelada.
 - Memoria: **O(V+E)**.
-- En la red modelada (44 nodos, 48 aristas): recomputación completa en el orden de **0,2 ms**; la simulación completa de un escenario con ranking queda por debajo de 5 ms.
+- Honestidad: a 44 nodos la diferencia O(V+E) vs O(V·E) es irrelevante (medible en microsegundos); migrar a listas de adyacencia es un cambio local, documentado como trabajo futuro si el motor escala a redes con miles de nodos (ver §6, decisión (a)).
 
 ## 4. Justificación de decisiones técnicas
 

@@ -25,7 +25,7 @@ Contingencia de tiempo: si el jurado interrumpió y vas atrasado, saltás la pan
 | Demo | 60 s | Guion de §1, recortado a lo esencial (red → falla Los Cactus → métricas → comparación → ranking). |
 | Cómo lo construimos | 30 s | Frontend maquetado con v0 y shadcn; las horas humanas fueron al motor: algoritmo determinista sobre un grafo de 44 nodos, IA subordinada con fallback: "el modelo no opina, calcula". |
 | Cómo lo probamos | 20 s | Unit del motor contra el fixture del evento real; Playwright (3 flujos); k6 con p95 < 100 ms; y la prueba que importa: recall 1.0 contra el evento de diciembre 2024. |
-| Cierre | 20 s | 3 cifras grandes: 12/12 barrios (recall 1.0), $48M de ahorro en la mejor maniobra, 15 camiones reales reproducidos. ODS 6, 9 y 12. Futuro: PULSO RIOJANO — horario de bombeo cruzando tarifa eléctrica y nivel de acuífero. |
+| Cierre | 20 s | 3 cifras grandes: 12/12 barrios (recall 1.0), la mejor maniobra cuesta $48M en vez de $81M (**$33M de ahorro**), 15 camiones reales reproducidos. ODS 6, 9 y 12. Futuro: PULSO RIOJANO — horario de bombeo cruzando tarifa eléctrica y nivel de acuífero. |
 
 Total: 180 s exactos. El cierre debe sonar ANTES de que el cronómetro marque 3:00.
 
@@ -47,7 +47,7 @@ Total: 180 s exactos. El cierre debe sonar ANTES de que el cronómetro marque 3:
 > "La IA no decide nada. Decide un algoritmo determinista que podés re-ejecutar mil veces y da siempre lo mismo. La IA, si anda, te explica el resultado en lenguaje natural; si no anda, hay un texto determinístico que es el default. El modelo no opina, calcula."
 
 **Cierre:**
-> "Tres cifras: 12 de 12 barrios correctos contra el evento real; 48 millones de pesos de diferencia entre la peor y la mejor maniobra; y los 15 camiones reales que usó Aguas Riojanas, reproducidos por el modelo. Agua limpia, infraestructura resiliente, menos desperdicio: ODS 6, 9 y 12. Y el próximo paso ya lo tenemos: PULSO RIOJANO, recomendando horarios de bombeo cruzando la tarifa eléctrica y el nivel del acuífero."
+> "Tres cifras: 12 de 12 barrios correctos contra el evento real; la mejor maniobra cuesta 48 millones de pesos contra 81 de no hacer nada — 33 millones de ahorro, 41 por ciento menos; y los 15 camiones reales que usó Aguas Riojanas, reproducidos por el modelo. Agua limpia, infraestructura resiliente, menos desperdicio: ODS 6, 9 y 12. Y el próximo paso ya lo tenemos: PULSO RIOJANO, recomendando horarios de bombeo cruzando la tarifa eléctrica y el nivel del acuífero."
 
 ## 4. Fallbacks y blindajes de la demo
 

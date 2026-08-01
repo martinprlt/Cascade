@@ -39,6 +39,8 @@ Frase clave para el pitch: "Ustedes lo plantearon esta mañana: el rumbo es el g
 
 **"¿Por qué simular en vez de medir?"** — Porque la medición te dice qué pasó; la simulación te dice qué pasaría ANTES de cortar un barrio. El operador actual decide por reclamos y experiencia (así se manejó diciembre 2024); CASCADE le permite comparar K alternativas y elegir la de menor impacto en milisegundos.
 
+**"¿Esto sirve solo para agua?"** — El modelo es de dominio independiente: un grafo es un grafo, con nodos, conexiones, flujo y propagación. El mismo motor con otros datos y otros supuestos aplica a gas, energía o logística. Pero lo que construimos y validamos hoy es el caso de estudio: la red de La Rioja. La generalización es una línea de visión, no una promesa de la demo.
+
 **"¿Y cuando tengan telemetría real?"** — Mejor: los supuestos se reemplazan por datos reales y el ranking de alternativas se vuelve recomendación operativa en tiempo real.
 
 ## 5. Datos de contexto citables (tener a mano en la demo)
@@ -62,7 +64,7 @@ Esta es la versión del pitch calibrada para el jurado de Aguas Riojanas (comple
 | 3. Decisión de scope | 15 s | "Construimos UNA cosa y dejamos afuera esto por esto" — habla con el criterio de Sorroche |
 | 4. Demo en vivo | 60 s | El 33% del pitch. Escenarios pre-horneados, cero improvisación |
 | 5. Evidencia (recall 1.0 + tests) | 25 s | El diferencial que ningún otro equipo tiene: validación contra el evento real + unit + Playwright + k6 |
-| 6. Cierre (3 cifras + puente al gemelo) | 20 s | Cifras grandes + "cuando llegue la telemetría, este motor la consume" + ODS 6, 9, 12 |
+| 6. Cierre (3 cifras + puente al gemelo + identidad del motor) | 20 s | Cifras grandes + "cuando llegue la telemetría, este motor la consume" + una línea de identidad: es un motor, no una app de agua + ODS 6, 9, 12 |
 
 Total: ~160 s → quedan 20 s de margen para respiraciones y pausas. Nunca llegar al tope.
 
@@ -84,7 +86,9 @@ Total: ~160 s → quedan 20 s de margen para respiraciones y pausas. Nunca llega
 "Lo validamos contra el evento real: los 12 barrios que se reportaron en diciembre son exactamente los 12 que predice el modelo. Recall del 100 por ciento. Y no cargamos el resultado a mano: la severidad emerge de la topología de la red. Lo probamos como se debe: tests unitarios sobre el motor, Playwright sobre el flujo completo, y una prueba de carga: cada simulación responde en menos de 100 milisegundos."
 
 **6. Cierre (20 s)**
-"Tres números: 12 barrios predichos, 2.880 metros cúbicos de déficit cuantificados, 60 millones de pesos de mitigación dimensionada. Cuando la telemetría de su hoja de ruta llegue, este motor la consume sin rediseño. CASCADE es la capa de simulación del gemelo digital, funcionando hoy. Agua limpia, innovación y producción responsable: ODS 6, 9 y 12. Gracias."
+"Tres números: 12 barrios predichos, 2.880 metros cúbicos de déficit cuantificados, 60 millones de pesos de mitigación dimensionada. Cuando la telemetría de su hoja de ruta llegue, este motor la consume sin rediseño. Y no es una app de agua: es un motor para infraestructuras críticas modeladas como grafos — el mismo modelo aplica a gas, energía o logística, lo que cambia es el dato. CASCADE es la capa de simulación del gemelo digital, funcionando hoy: agua limpia, innovación y producción responsable. Gracias."
+
+Por qué la generalización se menciona acá y no antes: en el bloque 3, antes de la demo, una frase "motor para infraestructuras críticas" puede hacer que el jurado institucional piense "¿nos venden algo genérico?" sin haber visto nada. En el cierre, DESPUÉS de que la demo y el recall 1.0 demostraron que el 100% es agua de La Rioja, la misma frase eleva lo que acaban de ver: no era una app, era un motor. El orden hace que la generalización se perciba como identidad, no como fuga de foco.
 
 ### Reglas de ejecución
 
@@ -92,6 +96,6 @@ Total: ~160 s → quedan 20 s de margen para respiraciones y pausas. Nunca llega
 - **La demo se opera con toggles pre-horneados, nunca a mano**: cada clic tiene que tener resultado conocido de antemano (valores esperados en data/red-la-rioja.json).
 - **Si el problema se pasa de 25 s, se corta del scope (bloque 3), no de la demo.**
 - **Si la IA cae o tarda**: no pasa nada, el explicador determinístico es el default y la demo no cambia.
-- **Nunca decir** "genérico para agua/energía/gas" en el pitch: es una línea de futuro, no una promesa. El demo es agua de La Rioja.
+- **La genericidad se menciona, no se promete.** Sí se dice (una sola línea, declarativa, en el cierre): "no es una app de agua, es un motor para infraestructuras críticas — el mismo modelo aplica a gas, energía o logística". Eso es identidad de arquitectura y conecta con el tagline. NO se dice como roadmap ("vamos a hacerlo para gas") ni como feature ni como lista. El demo y la validación son 100% agua de La Rioja.
 - **Ensayo obligatorio**: 3 pasadas completas con cronómetro entre 16:30 y 17:00. Si una pasada pasa de 170 s, se recorta el bloque 3 o el 5, nunca el 4 (la demo es lo que se recuerda).
 - Si el jurado institucional pregunta al final, usar las respuestas preparadas de la sección 4 de este documento.
