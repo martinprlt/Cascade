@@ -307,7 +307,7 @@ export default function NetworkView({
         userSelect: "none",
       }}
     >
-      {/* GIS HUD Control Panel Bar & Legend */}
+      {/* GIS HUD Control Panel Bar & Complete Legend */}
       <div
         style={{
           position: "absolute",
@@ -339,31 +339,44 @@ export default function NetworkView({
           SYSTEM: LA_RIOJA_AMP_MAP (1600x1000 Canvas)
         </div>
 
-        {/* Node Type Legend */}
-        <div style={{ background: "rgba(14,20,26,0.92)", border: "1px solid #3d4a3f", padding: "6px 10px", borderRadius: 2, display: "flex", flexWrap: "wrap", gap: 10, fontSize: 10 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.barrio }}>home</span>
-            <span>Hogares</span>
+        {/* Node Type & Pipeline Legend */}
+        <div style={{ background: "rgba(14,20,26,0.92)", border: "1px solid #3d4a3f", padding: "6px 10px", borderRadius: 2, display: "flex", flexDirection: "column", gap: 6, fontSize: 10 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.barrio }}>home</span>
+              <span>Hogares</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.perforacion }}>water_drop</span>
+              <span>Pozo</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.acueducto }}>pipeline</span>
+              <span>Acueducto</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.tanque }}>water_full</span>
+              <span>Tanque</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.bomba }}>bolt</span>
+              <span>Bomba</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.valvula }}>tune</span>
+              <span>Válvula</span>
+            </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.perforacion }}>water_drop</span>
-            <span>Pozo</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.acueducto }}>pipeline</span>
-            <span>Acueducto</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.tanque }}>water_full</span>
-            <span>Tanque</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.bomba }}>bolt</span>
-            <span>Bomba</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.valvula }}>tune</span>
-            <span>Válvula</span>
+          
+          <div style={{ borderTop: "1px solid #1E293B", paddingTop: 4, display: "flex", gap: 12, fontSize: 9, color: "#bccabc" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ width: 14, height: 2.5, backgroundColor: "#12B76A", display: "inline-block" }}></span>
+              <span>Tubería Activa (Con flujo)</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ width: 14, height: 0, borderTop: "2px dashed #475569", display: "inline-block" }}></span>
+              <span>Tubería Cerrada / Inactiva</span>
+            </div>
           </div>
         </div>
       </div>
@@ -639,7 +652,7 @@ export default function NetworkView({
               </g>
             ))}
 
-            {/* Pipelines */}
+            {/* Pipelines (Green = Active Flow; Dashed Gray = Closed / Cut) */}
             {aristas.map((a, i) => {
               const fDesde = POSICIONES[a.from];
               const fHasta = POSICIONES[a.to];
