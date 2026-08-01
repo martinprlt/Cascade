@@ -666,9 +666,10 @@ export default function NetworkView({
             {nodos.map((n) => {
               const p = posicionNodo(n);
               const sev = severidad?.[n.id];
+              const esSeleccionado = nodoSeleccionado?.id === n.id;
               const fill =
                 n.estado === "fallado" ? "#D92D20" : sev ? COLORES_SEVERIDAD[sev] : COLOR_NODO_BASE[n.tipo] ?? "#94A3B8";
-              const contorno = "#E2E8F0";
+              const contorno = esSeleccionado ? "#51df8e" : "#E2E8F0";
 
               return (
                 <g
@@ -681,13 +682,39 @@ export default function NetworkView({
                 >
                   {is3D && <ellipse cx={p.x} cy={p.y + 14} rx={14} ry={7} fill="#000000" opacity={0.6} />}
 
-                  {sev === "sin_servicio" && (
+                  {/* HIGH VISIBILITY SELECTION HIGHLIGHT RINGS & CROSSHAIR */}
+                  {esSeleccionado && (
+                    <g>
+                      {/* Rotating Neon Green Outer Ring */}
+                      <circle cx={p.x} cy={p.y} r={32} fill="none" stroke="#51df8e" strokeWidth="2.5" strokeDasharray="6 3">
+                        <animate attributeName="stroke-dashoffset" values="0;18" dur="1s" repeatCount="indefinite" />
+                        <animate attributeName="r" values="26;34;26" dur="1.5s" repeatCount="indefinite" />
+                      </circle>
+                      {/* Inner Glowing Aura */}
+                      <circle cx={p.x} cy={p.y} r={22} fill="rgba(81, 223, 142, 0.25)" stroke="#51df8e" strokeWidth="1.5" />
+                      {/* Target Crosshairs */}
+                      <line x1={p.x - 38} y1={p.y} x2={p.x - 22} y2={p.y} stroke="#51df8e" strokeWidth="2" />
+                      <line x1={p.x + 22} y1={p.y} x2={p.x + 38} y2={p.y} stroke="#51df8e" strokeWidth="2" />
+                      <line x1={p.x} y1={p.y - 38} x2={p.x} y2={p.y - 22} stroke="#51df8e" strokeWidth="2" />
+                      <line x1={p.x} y1={p.y + 22} x2={p.x} y2={p.y + 38} stroke="#51df8e" strokeWidth="2" />
+
+                      {/* Selected Node Badge Header */}
+                      <g transform={`translate(${p.x - 45}, ${p.y - 42})`}>
+                        <rect width="90" height="18" rx="3" fill="#51df8e" />
+                        <text x="45" y="13" textAnchor="middle" fontSize="9" fontWeight="900" fill="#00391d" letterSpacing="0.08em">
+                          SELECCIONADO
+                        </text>
+                      </g>
+                    </g>
+                  )}
+
+                  {sev === "sin_servicio" && !esSeleccionado && (
                     <circle cx={p.x} cy={p.y} r={24} fill="none" stroke="#D92D20" strokeWidth={1.5} opacity={0.75}>
                       <animate attributeName="r" values="14;28;14" dur="2s" repeatCount="indefinite" />
                       <animate attributeName="opacity" values="0.9;0.2;0.9" dur="2s" repeatCount="indefinite" />
                     </circle>
                   )}
-                  {sev === "baja_presion" && (
+                  {sev === "baja_presion" && !esSeleccionado && (
                     <circle cx={p.x} cy={p.y} r={20} fill="none" stroke="#F79009" strokeWidth={1} opacity={0.5}>
                       <animate attributeName="r" values="12;22;12" dur="3s" repeatCount="indefinite" />
                     </circle>
@@ -700,11 +727,11 @@ export default function NetworkView({
                   {etiquetas && n.tipo === "barrio" && (
                     <text
                       x={p.x}
-                      y={p.y + 28}
+                      y={p.y + (esSeleccionado ? 34 : 28)}
                       textAnchor="middle"
                       fontSize={11}
                       fontWeight="bold"
-                      fill="#E2E8F0"
+                      fill={esSeleccionado ? "#51df8e" : "#E2E8F0"}
                       style={{ userSelect: "none", pointerEvents: "none" }}
                     >
                       {etiquetaCorta(n.nombre)}
