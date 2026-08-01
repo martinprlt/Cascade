@@ -74,78 +74,78 @@ const INFO_TIPO_NODO: Record<
 
 const POSICIONES: Record<string, { x: number; y: number }> = {
   // Oeste (Sanagasta & Las Padercitas)
-  "acu-dique-los-sauces": { x: 80, y: 70 },
-  "planta-padercitas": { x: 160, y: 110 },
-  "valvula-padercitas": { x: 250, y: 150 },
-  "acu-sanagasta": { x: 320, y: 110 },
-  "valvula-sanagasta": { x: 410, y: 110 },
-  "tanque-oeste": { x: 350, y: 240 },
-  "barrio-faldeo-del-velasco": { x: 500, y: 260 },
-  "dist-oeste": { x: 350, y: 420 },
+  "acu-dique-los-sauces": { x: 90, y: 80 },
+  "planta-padercitas": { x: 180, y: 120 },
+  "valvula-padercitas": { x: 270, y: 160 },
+  "acu-sanagasta": { x: 350, y: 120 },
+  "valvula-sanagasta": { x: 440, y: 120 },
+  "tanque-oeste": { x: 380, y: 250 },
+  "barrio-faldeo-del-velasco": { x: 530, y: 270 },
+  "dist-oeste": { x: 380, y: 430 },
 
-  "perf-plaza-pesebre": { x: 80, y: 220 },
-  "perf-cochangasta": { x: 80, y: 290 },
-  "perf-unlar": { x: 80, y: 360 },
-  "perf-colegio-medico": { x: 80, y: 430 },
-  "perf-b-municipal": { x: 80, y: 500 },
-  "perf-circunvalacion": { x: 80, y: 570 },
-  "perf-parque-ciudad": { x: 80, y: 640 },
+  "perf-plaza-pesebre": { x: 90, y: 230 },
+  "perf-cochangasta": { x: 90, y: 300 },
+  "perf-unlar": { x: 90, y: 370 },
+  "perf-colegio-medico": { x: 90, y: 440 },
+  "perf-b-municipal": { x: 90, y: 510 },
+  "perf-circunvalacion": { x: 90, y: 580 },
+  "perf-parque-ciudad": { x: 90, y: 650 },
 
-  "valvula-rama-alta": { x: 520, y: 160 },
-  "barrio-san-nicolas": { x: 670, y: 120 },
-  "barrio-don-bosco": { x: 670, y: 220 },
+  "valvula-rama-alta": { x: 540, y: 170 },
+  "barrio-san-nicolas": { x: 690, y: 130 },
+  "barrio-don-bosco": { x: 690, y: 230 },
 
   // Centro
-  "barrio-vargas": { x: 680, y: 320 },
-  "perf-vargas": { x: 580, y: 390 },
-  "valvula-dist-centro": { x: 580, y: 460 },
-  "barrio-centro": { x: 520, y: 360 },
-  "tanque-central": { x: 700, y: 500 },
+  "barrio-vargas": { x: 700, y: 330 },
+  "perf-vargas": { x: 600, y: 400 },
+  "valvula-dist-centro": { x: 600, y: 470 },
+  "barrio-centro": { x: 540, y: 370 },
+  "tanque-central": { x: 720, y: 510 },
 
   // Este
-  "valvula-este": { x: 920, y: 460 },
-  "acu-zona-este": { x: 1140, y: 460 },
-  "dist-este": { x: 1360, y: 460 },
-  "barrio-yacampis": { x: 1480, y: 320 },
-  "barrio-la-rodadera": { x: 1480, y: 460 },
-  "barrio-centro-comercial": { x: 1480, y: 600 },
-  "perf-parque-industrial": { x: 1300, y: 640 },
-  "barrio-parque-industrial": { x: 1480, y: 680 },
+  "valvula-este": { x: 940, y: 470 },
+  "acu-zona-este": { x: 1160, y: 470 },
+  "dist-este": { x: 1370, y: 470 },
+  "barrio-yacampis": { x: 1490, y: 330 },
+  "barrio-la-rodadera": { x: 1490, y: 470 },
+  "barrio-centro-comercial": { x: 1490, y: 610 },
+  "perf-parque-industrial": { x: 1320, y: 650 },
+  "barrio-parque-industrial": { x: 1490, y: 690 },
 
   // Interconexiones
-  "valvula-inter-sur-oeste": { x: 580, y: 570 },
-  "valvula-inter-sur-este": { x: 780, y: 590 },
+  "valvula-inter-sur-oeste": { x: 600, y: 580 },
+  "valvula-inter-sur-este": { x: 800, y: 600 },
 
   // Sur
-  "dist-sur": { x: 850, y: 700 },
-  "bomba-sur": { x: 1050, y: 700 },
-  "valvula-cactus": { x: 850, y: 800 },
-  "perf-copegraf": { x: 100, y: 880 },
-  "perf-lawn-tenis": { x: 250, y: 880 },
-  "perf-las-talas": { x: 400, y: 880 },
-  "perf-parque-familia": { x: 550, y: 880 },
-  "perf-los-cactus": { x: 700, y: 880 },
+  "dist-sur": { x: 870, y: 710 },
+  "bomba-sur": { x: 1070, y: 710 },
+  "valvula-cactus": { x: 870, y: 810 },
+  "perf-copegraf": { x: 110, y: 880 },
+  "perf-lawn-tenis": { x: 260, y: 880 },
+  "perf-las-talas": { x: 410, y: 880 },
+  "perf-parque-familia": { x: 560, y: 880 },
+  "perf-los-cactus": { x: 710, y: 880 },
 
-  "barrio-procrear": { x: 700, y: 950 },
-  "barrio-nk-alta": { x: 830, y: 950 },
-  "barrio-las-talas-alta": { x: 960, y: 950 },
-  "barrio-virgen-de-guadalupe": { x: 1050, y: 950 },
-  "barrio-luis-vernet": { x: 1180, y: 790 },
-  "barrio-el-mirador": { x: 1300, y: 790 },
-  "barrio-coop-santa-rosa": { x: 1420, y: 790 },
-  "barrio-susana-quintela": { x: 1180, y: 880 },
-  "barrio-rivadavia": { x: 1300, y: 880 },
-  "barrio-emp-telecom": { x: 1420, y: 880 },
-  "barrio-circunvalacion": { x: 1180, y: 950 },
-  "barrio-nueva-esperanza": { x: 1300, y: 950 },
-  "barrio-san-cayetano": { x: 1420, y: 950 },
+  "barrio-procrear": { x: 710, y: 950 },
+  "barrio-nk-alta": { x: 840, y: 950 },
+  "barrio-las-talas-alta": { x: 970, y: 950 },
+  "barrio-virgen-de-guadalupe": { x: 1070, y: 950 },
+  "barrio-luis-vernet": { x: 1200, y: 790 },
+  "barrio-el-mirador": { x: 1320, y: 790 },
+  "barrio-coop-santa-rosa": { x: 1440, y: 790 },
+  "barrio-susana-quintela": { x: 1200, y: 880 },
+  "barrio-rivadavia": { x: 1320, y: 880 },
+  "barrio-emp-telecom": { x: 1440, y: 880 },
+  "barrio-circunvalacion": { x: 1200, y: 950 },
+  "barrio-nueva-esperanza": { x: 1320, y: 950 },
+  "barrio-san-cayetano": { x: 1440, y: 950 },
 };
 
 const ZONAS: Array<{ zona: string; x: number; y: number; w: number; h: number }> = [
-  { zona: "OESTE (Sanagasta & Las Padercitas)", x: 30, y: 30, w: 600, h: 650 },
-  { zona: "CENTRO (Vargas & Urbano)", x: 480, y: 280, w: 320, h: 300 },
-  { zona: "ESTE (Acueducto & Parque Industrial)", x: 880, y: 260, w: 680, h: 460 },
-  { zona: "SUR (Perforaciones & Los Cactus)", x: 30, y: 740, w: 1530, h: 240 },
+  { zona: "OESTE (Sanagasta & Las Padercitas)", x: 30, y: 30, w: 620, h: 650 },
+  { zona: "CENTRO (Vargas & Urbano)", x: 490, y: 280, w: 330, h: 300 },
+  { zona: "ESTE (Acueducto & Parque Industrial)", x: 890, y: 260, w: 680, h: 460 },
+  { zona: "SUR (Perforaciones & Los Cactus)", x: 30, y: 740, w: 1540, h: 240 },
 ];
 
 function posicionNodo(nodo: Nodo): { x: number; y: number } {
@@ -172,8 +172,9 @@ export default function NetworkView({
   etiquetas = true,
   onSimularCustom,
 }: NetworkViewProps) {
+  // Default Initial Pan & Zoom so the ENTIRE network fits on screen when loaded!
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState<number>(1.0);
+  const [zoom, setZoom] = useState<number>(0.72);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [is3D, setIs3D] = useState<boolean>(false);
@@ -213,12 +214,12 @@ export default function NetworkView({
   const handleWheel = useCallback((e: WheelEvent<HTMLDivElement>) => {
     e.preventDefault();
     const factor = e.deltaY < 0 ? 1.08 : 0.92;
-    setZoom((prevZoom) => Math.min(Math.max(prevZoom * factor, 0.5), 3.0));
+    setZoom((prevZoom) => Math.min(Math.max(prevZoom * factor, 0.4), 3.0));
   }, []);
 
   const resetView = useCallback(() => {
     setPan({ x: 0, y: 0 });
-    setZoom(1.0);
+    setZoom(0.72);
   }, []);
 
   const handleCardHeaderMouseDown = (e: MouseEvent<HTMLDivElement>) => {
@@ -313,7 +314,7 @@ export default function NetworkView({
       <div
         style={{
           position: "absolute",
-          top: 12,
+          top: 10,
           left: 12,
           zIndex: 30,
           display: "flex",
@@ -387,7 +388,7 @@ export default function NetworkView({
       <div
         style={{
           position: "absolute",
-          top: 12,
+          top: 10,
           right: 12,
           zIndex: 30,
           display: "flex",
@@ -417,7 +418,7 @@ export default function NetworkView({
           +
         </button>
         <button
-          onClick={() => setZoom((z) => Math.max(z * 0.8, 0.5))}
+          onClick={() => setZoom((z) => Math.max(z * 0.8, 0.4))}
           style={{ backgroundColor: "#1a2026", color: "#E2E8F0", border: "1px solid #334155", width: 28, height: 28, fontSize: 16, fontWeight: "bold", cursor: "pointer", borderRadius: 2 }}
         >
           -

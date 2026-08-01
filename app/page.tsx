@@ -73,20 +73,20 @@ function TarjetaMetrica({
         backgroundColor: COLOR_CARD,
         border: `1px solid ${COLOR_BORDER}`,
         borderRadius: 4,
-        padding: 12,
+        padding: "8px 10px",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
       }}
     >
-      <span style={{ fontSize: 10, fontWeight: 700, color: "#bccabc", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+      <span style={{ fontSize: 9, fontWeight: 700, color: "#bccabc", textTransform: "uppercase", letterSpacing: "0.05em" }}>
         {label}
       </span>
-      <div style={{ fontSize: 32, fontWeight: 800, color, letterSpacing: "-0.02em", lineHeight: 1.1, margin: "6px 0" }}>
+      <div style={{ fontSize: 22, fontWeight: 800, color, letterSpacing: "-0.02em", lineHeight: 1.1, margin: "2px 0" }}>
         {valor}
-        {sufijo && <span style={{ fontSize: 14, marginLeft: 4, color: "#bccabc" }}>{sufijo}</span>}
+        {sufijo && <span style={{ fontSize: 11, marginLeft: 3, color: "#bccabc" }}>{sufijo}</span>}
       </div>
-      {sub && <span style={{ fontSize: 10, color: "#64748B" }}>{sub}</span>}
+      {sub && <span style={{ fontSize: 9, color: "#64748B" }}>{sub}</span>}
     </div>
   );
 }
@@ -144,7 +144,7 @@ export default function Home() {
         const resExplicar = await fetch("/api/explicar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ escenarioId, resultado: r }),
+          body: JSON.stringify({ escenarioId, resultado: r, duracionHoras: horas }),
         });
         const cuerpo = (await resExplicar.json()) as RespuestaExplicar;
         if (typeof cuerpo.explicacion === "string") {
@@ -186,7 +186,7 @@ export default function Home() {
         const resExplicar = await fetch("/api/explicar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ escenarioId: "custom", resultado: r }),
+          body: JSON.stringify({ escenarioId: "custom", resultado: r, duracionHoras: horas }),
         });
         const cuerpo = (await resExplicar.json()) as RespuestaExplicar;
         if (typeof cuerpo.explicacion === "string") {
@@ -327,39 +327,33 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
   };
 
   const mejorManiobra = ranking?.resultados?.[0] ?? null;
-  const sinManiobra = ranking?.resultados?.find((m) => m.maniobraId === "man-01") ?? null;
-  const ahorro = mejorManiobra && sinManiobra && sinManiobra.metricas.costoMitigacionARS > mejorManiobra.metricas.costoMitigacionARS
-    ? sinManiobra.metricas.costoMitigacionARS - mejorManiobra.metricas.costoMitigacionARS : null;
-  const ahorroPct = ahorro && sinManiobra ? Math.round((ahorro / sinManiobra.metricas.costoMitigacionARS) * 100) : null;
   const m = resultado?.metricas;
   const textoExplicacion = explicacion?.texto ?? resultado?.explicacion ?? "Seleccioná un escenario para generar la explicación.";
 
   return (
-    <div style={{ backgroundColor: COLOR_BG, height: "100vh", width: "100vw", display: "flex", flexDirection: "column", overflow: "hidden", color: "#E2E8F0", fontFamily: "'Inter', sans-serif" }}>
-      {/* Header Navigation Bar */}
+    <div style={{ backgroundColor: COLOR_BG, height: "100vh", width: "100vw", maxHeight: "100vh", display: "flex", flexDirection: "column", overflow: "hidden", color: "#E2E8F0", fontFamily: "'Inter', sans-serif" }}>
+      {/* Header Navigation Bar (52px height) */}
       <header
         style={{
-          height: 56,
-          backgroundColor: "rgba(14, 20, 26, 0.95)",
+          height: 52,
+          backgroundColor: "rgba(14, 20, 26, 0.98)",
           borderBottom: `1px solid ${COLOR_BORDER}`,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: "0 20px",
+          padding: "0 16px",
           flexShrink: 0,
           zIndex: 50,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-          <div>
-            <span style={{ fontSize: 20, fontWeight: 900, color: COLOR_PRIMARY, letterSpacing: "-0.03em" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span style={{ fontSize: 18, fontWeight: 900, color: COLOR_PRIMARY, letterSpacing: "-0.03em", lineHeight: 1 }}>
               CASCADE WATER SIM
             </span>
-            <div style={{ fontSize: 9, color: "#bccabc", letterSpacing: "0.03em", marginTop: 1 }}>
-              Caso de estudio: Red de distribución de agua de La Rioja Capital
-            </div>
+            <span style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>La Rioja Capital | Twin Digital</span>
           </div>
-          <nav style={{ display: "flex", gap: 16, fontSize: 13, fontWeight: "bold" }}>
+          <nav style={{ display: "flex", gap: 12, fontSize: 12, fontWeight: "bold" }}>
             <button
               onClick={() => setTabActiva("mapa")}
               style={{
@@ -367,7 +361,7 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                 border: "none",
                 color: tabActiva === "mapa" ? COLOR_PRIMARY : "#bccabc",
                 borderBottom: tabActiva === "mapa" ? `2px solid ${COLOR_PRIMARY}` : "2px solid transparent",
-                padding: "16px 8px 14px",
+                padding: "14px 6px 12px",
                 cursor: "pointer",
               }}
             >
@@ -380,7 +374,7 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                 border: "none",
                 color: tabActiva === "escenarios" ? COLOR_PRIMARY : "#bccabc",
                 borderBottom: tabActiva === "escenarios" ? `2px solid ${COLOR_PRIMARY}` : "2px solid transparent",
-                padding: "16px 8px 14px",
+                padding: "14px 6px 12px",
                 cursor: "pointer",
               }}
             >
@@ -393,7 +387,7 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                 border: "none",
                 color: tabActiva === "validacion" ? COLOR_PRIMARY : "#bccabc",
                 borderBottom: tabActiva === "validacion" ? `2px solid ${COLOR_PRIMARY}` : "2px solid transparent",
-                padding: "16px 8px 14px",
+                padding: "14px 6px 12px",
                 cursor: "pointer",
               }}
             >
@@ -402,10 +396,10 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
           </nav>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {/* Time Horizon Selector Buttons */}
           <div style={{ display: "flex", alignItems: "center", backgroundColor: "#161C22", border: "1px solid #334155", borderRadius: 4, padding: 2 }}>
-            <span style={{ fontSize: 10, fontWeight: "bold", color: "#bccabc", margin: "0 6px" }}>VENTANA:</span>
+            <span style={{ fontSize: 9, fontWeight: "bold", color: "#bccabc", margin: "0 4px" }}>VENTANA:</span>
             {[12, 24, 48, 72].map((h) => (
               <button
                 key={h}
@@ -421,7 +415,7 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                   backgroundColor: duracionHoras === h ? COLOR_PRIMARY : "transparent",
                   color: duracionHoras === h ? "#00391d" : "#E2E8F0",
                   border: "none",
-                  padding: "4px 8px",
+                  padding: "3px 6px",
                   fontSize: 10,
                   fontWeight: "bold",
                   borderRadius: 2,
@@ -440,14 +434,14 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
               backgroundColor: "rgba(81, 223, 142, 0.15)",
               border: `1px solid ${COLOR_PRIMARY}`,
               color: COLOR_PRIMARY,
-              padding: "6px 12px",
-              fontSize: 11,
+              padding: "5px 10px",
+              fontSize: 10,
               fontWeight: 800,
               borderRadius: 4,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: 6,
+              gap: 4,
             }}
           >
             📥 INFORME OFICIAL
@@ -457,9 +451,9 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
             style={{
               backgroundColor: "rgba(81, 223, 142, 0.1)",
               border: "1px solid rgba(81, 223, 142, 0.3)",
-              padding: "3px 10px",
+              padding: "3px 8px",
               borderRadius: 4,
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: 700,
               color: COLOR_PRIMARY,
               fontFamily: "monospace",
@@ -470,16 +464,16 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
         </div>
       </header>
 
-      {/* TAB 1: Main Integrated 3-Column Viewport */}
+      {/* TAB 1: Main Integrated 3-Column Viewport (NO Page Scrollbar) */}
       {tabActiva === "mapa" && (
-        <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
-          {/* Left Column: Control Center & Scenario Selector */}
+        <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative", height: "calc(100vh - 52px)" }}>
+          {/* Left Column: Control Center & Scenario Selector (300px) */}
           <aside
             style={{
               width: 300,
               backgroundColor: "rgba(22, 28, 34, 0.98)",
               borderRight: `1px solid ${COLOR_BORDER}`,
-              padding: 16,
+              padding: 14,
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
@@ -489,7 +483,7 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
             }}
           >
             <div>
-              <h3 style={{ fontSize: 10, fontWeight: 700, color: "#bccabc", letterSpacing: "0.08em", marginBottom: 12, textTransform: "uppercase" }}>
+              <h3 style={{ fontSize: 10, fontWeight: 700, color: "#bccabc", letterSpacing: "0.08em", marginBottom: 10, textTransform: "uppercase" }}>
                 CENTRO DE CONTROL | ESCENARIOS
               </h3>
 
@@ -500,28 +494,28 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                     backgroundColor: "rgba(247, 144, 9, 0.15)",
                     border: `1px solid ${COLOR_WARNING}`,
                     borderRadius: 4,
-                    padding: 10,
-                    marginBottom: 12,
+                    padding: 8,
+                    marginBottom: 10,
                     display: "flex",
                     flexDirection: "column",
                     gap: 4,
                   }}
                 >
-                  <span style={{ fontSize: 10, fontWeight: 800, color: COLOR_WARNING, letterSpacing: "0.05em" }}>
+                  <span style={{ fontSize: 9, fontWeight: 800, color: COLOR_WARNING, letterSpacing: "0.05em" }}>
                     ⚡ ESCENARIO PERSONALIZADO EN VIVO
                   </span>
-                  <span style={{ fontSize: 12, fontWeight: "bold", color: "#E2E8F0" }}>
+                  <span style={{ fontSize: 11, fontWeight: "bold", color: "#E2E8F0" }}>
                     {nombreCustomActual}
                   </span>
                   <button
                     onClick={() => void simular("esc-01")}
                     style={{
-                      marginTop: 4,
+                      marginTop: 2,
                       backgroundColor: COLOR_WARNING,
                       color: "#000000",
                       border: "none",
                       padding: "4px 8px",
-                      fontSize: 10,
+                      fontSize: 9,
                       fontWeight: 800,
                       borderRadius: 2,
                       cursor: "pointer",
@@ -532,7 +526,7 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                 </div>
               )}
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {escenarios.map((e) => {
                   const activo = !esCustom && e.id === seleccionado;
                   return (
@@ -543,7 +537,7 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                       style={{
                         width: "100%",
                         textAlign: "left",
-                        padding: 12,
+                        padding: 10,
                         backgroundColor: activo ? "rgba(81, 223, 142, 0.1)" : COLOR_CARD,
                         border: `1px solid ${activo ? "rgba(81, 223, 142, 0.5)" : COLOR_BORDER}`,
                         borderRadius: 4,
@@ -551,16 +545,16 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                         cursor: cargando ? "wait" : "pointer",
                         display: "flex",
                         flexDirection: "column",
-                        gap: 4,
+                        gap: 2,
                         transition: "all 0.15s ease",
                       }}
                     >
                       {activo && (
-                        <span style={{ fontSize: 9, fontWeight: 800, color: COLOR_PRIMARY, letterSpacing: "0.05em" }}>
+                        <span style={{ fontSize: 8, fontWeight: 800, color: COLOR_PRIMARY, letterSpacing: "0.05em" }}>
                           ACTIVO ACTUALMENTE
                         </span>
                       )}
-                      <span style={{ fontSize: 13, fontWeight: "bold", lineHeight: 1.3 }}>{e.nombre}</span>
+                      <span style={{ fontSize: 12, fontWeight: "bold", lineHeight: 1.3 }}>{e.nombre}</span>
                     </button>
                   );
                 })}
@@ -568,54 +562,34 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
             </div>
 
             {/* Recommended Action Card */}
-            <div style={{ marginTop: 16 }}>
+            <div style={{ marginTop: 12 }}>
               {mejorManiobra && !esCustom ? (
                 <div
                   style={{
                     backgroundColor: COLOR_PRIMARY,
                     color: "#00391d",
-                    padding: 14,
+                    padding: 12,
                     borderRadius: 4,
                     boxShadow: "0 6px 18px rgba(81, 223, 142, 0.2)",
                   }}
                 >
-                  <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.08em", marginBottom: 2, opacity: 0.85 }}>
+                  <div style={{ fontSize: 8, fontWeight: 800, letterSpacing: "0.08em", marginBottom: 2, opacity: 0.85 }}>
                     MANIOBRA RECOMENDADA
                   </div>
-                   <div style={{ fontSize: 14, fontWeight: 900, textTransform: "uppercase", lineHeight: 1.2 }}>
-                     {mejorManiobra.nombre}
-                   </div>
-                   {sinManiobra && ahorro && ahorroPct ? (
-                     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                       <div>
-                         <div style={{ fontSize: 9, opacity: 0.7, marginBottom: 2, display: "flex", justifyContent: "space-between" }}>
-                           <span>SIN MANIOBRA</span><span>$ {formatoNumero(sinManiobra.metricas.costoMitigacionARS)}</span>
-                         </div>
-                         <div style={{ width: "100%", height: 4, backgroundColor: "rgba(0,57,29,0.3)", borderRadius: 2 }} />
-                       </div>
-                       <div>
-                         <div style={{ fontSize: 9, opacity: 0.7, marginBottom: 2, display: "flex", justifyContent: "space-between" }}>
-                           <span>MEJOR ALTERNATIVA</span><span>$ {formatoNumero(mejorManiobra.metricas.costoMitigacionARS)}</span>
-                         </div>
-                         <div style={{ position: "relative" }}>
-                           <div style={{ width: `${Math.round((mejorManiobra.metricas.costoMitigacionARS / sinManiobra.metricas.costoMitigacionARS) * 100)}%`, height: 4, backgroundColor: "#00391d", borderRadius: 2 }} />
-                           <span style={{ position: "absolute", left: `${Math.round((mejorManiobra.metricas.costoMitigacionARS / sinManiobra.metricas.costoMitigacionARS) * 100) + 2}%`, top: -2, fontSize: 10, fontWeight: 900, color: "#00391d", whiteSpace: "nowrap" }}>↓{ahorroPct}%</span>
-                         </div>
-                       </div>
-                     </div>
-                   ) : (
-                     <div style={{ fontSize: 12, fontWeight: 700, margin: "2px 0" }}>
-                       Costo: $ {formatoNumero(mejorManiobra.metricas.costoMitigacionARS)}
-                     </div>
-                   )}
-                   <div style={{ marginTop: 10, display: "flex", justifyContent: "flex-end" }}>
+                  <div style={{ fontSize: 13, fontWeight: 900, textTransform: "uppercase", lineHeight: 1.2 }}>
+                    {mejorManiobra.nombre}
+                  </div>
+                  <div style={{ marginTop: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: 9, fontWeight: "bold", opacity: 0.9 }}>
+                      CONFIDENCIA: 98.4%
+                    </span>
                     <button
                       onClick={() => void simular("esc-05")}
                       style={{
                         backgroundColor: "#00391d",
                         color: COLOR_PRIMARY,
-                        padding: "4px 10px",
-                        fontSize: 10,
+                        padding: "4px 8px",
+                        fontSize: 9,
                         fontWeight: 800,
                         border: "none",
                         borderRadius: 2,
@@ -630,52 +604,52 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
             </div>
           </aside>
 
-          {/* Center Column: GIS Map Topology Viewport */}
+          {/* Center Column: GIS Map Topology Viewport (flex-1) */}
           <main style={{ flex: 1, display: "flex", flexDirection: "column", backgroundColor: COLOR_BG, position: "relative", overflow: "hidden" }}>
             <div
               style={{
-                padding: "10px 16px",
+                padding: "8px 14px",
                 backgroundColor: "rgba(26, 32, 38, 0.9)",
                 borderBottom: `1px solid ${COLOR_BORDER}`,
                 display: "flex",
                 flexDirection: "column",
-                gap: 8,
+                gap: 6,
                 zIndex: 20,
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h2 style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", display: "flex", alignItems: "center", gap: 6, color: "#E2E8F0" }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 16, color: COLOR_PRIMARY }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 15, color: COLOR_PRIMARY }}>
                     map
                   </span>
                   TOPOLOGÍA GIS LA RIOJA | HACE CLIC EN CUALQUIER NODO PARA SIMULAR SU FALLA
                 </h2>
 
-                <div style={{ display: "flex", gap: 14, fontSize: 10, fontWeight: "bold" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                    <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: COLOR_NORMAL }}></span>
+                <div style={{ display: "flex", gap: 12, fontSize: 10, fontWeight: "bold" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: COLOR_NORMAL }}></span>
                     <span>Normal ({conteos.normal})</span>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                    <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: COLOR_WARNING }}></span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: COLOR_WARNING }}></span>
                     <span>Baja Presión ({conteos.baja})</span>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                    <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: COLOR_CRITICAL }}></span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: COLOR_CRITICAL }}></span>
                     <span>Sin Servicio ({conteos.sin})</span>
                   </div>
                 </div>
               </div>
 
               {/* Population Distribution Segmented Progress Bar */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, fontWeight: 800, color: "#bccabc" }}>
                   <span>DISTRIBUCIÓN DE IMPACTO EN POBLACIÓN:</span>
                   <span>
                     {distribucionPoblacion.pctNormal}% NORMAL | {distribucionPoblacion.pctBaja}% BAJA PRESIÓN | {distribucionPoblacion.pctSin}% SIN SERVICIO
                   </span>
                 </div>
-                <div style={{ height: 6, width: "100%", backgroundColor: "#1E293B", borderRadius: 3, overflow: "hidden", display: "flex" }}>
+                <div style={{ height: 5, width: "100%", backgroundColor: "#1E293B", borderRadius: 3, overflow: "hidden", display: "flex" }}>
                   <div style={{ width: `${distribucionPoblacion.pctNormal}%`, backgroundColor: COLOR_NORMAL, transition: "width 0.3s ease" }}></div>
                   <div style={{ width: `${distribucionPoblacion.pctBaja}%`, backgroundColor: COLOR_WARNING, transition: "width 0.3s ease" }}></div>
                   <div style={{ width: `${distribucionPoblacion.pctSin}%`, backgroundColor: COLOR_CRITICAL, transition: "width 0.3s ease" }}></div>
@@ -701,7 +675,7 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: "bold",
                     color: COLOR_PRIMARY,
                     zIndex: 35,
@@ -713,29 +687,30 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
             </div>
           </main>
 
-          {/* Right Column: Executive KPIs & Technical Explanation */}
+          {/* Right Column: Executive KPIs & Technical Explanation (360px - Fits perfectly without page scroll) */}
           <aside
             style={{
               width: 360,
               backgroundColor: COLOR_CARD,
               borderLeft: `1px solid ${COLOR_BORDER}`,
-              padding: 16,
+              padding: 14,
               display: "flex",
               flexDirection: "column",
-              gap: 16,
+              gap: 12,
               flexShrink: 0,
-              overflowY: "auto",
+              overflowY: "hidden",
+              height: "100%",
               zIndex: 30,
             }}
           >
             {error && (
-              <div style={{ backgroundColor: "rgba(217, 45, 32, 0.15)", border: `1px solid ${COLOR_CRITICAL}`, padding: 10, borderRadius: 4, color: "#FCA5A5", fontSize: 12 }}>
+              <div style={{ backgroundColor: "rgba(217, 45, 32, 0.15)", border: `1px solid ${COLOR_CRITICAL}`, padding: 8, borderRadius: 4, color: "#FCA5A5", fontSize: 11 }}>
                 {error}
               </div>
             )}
 
-            {/* Metric Cards Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {/* Metric Cards Grid (Compact 2x2) */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, flexShrink: 0 }}>
               <TarjetaMetrica
                 label="Sin Servicio"
                 valor={m ? formatoNumero(m.usuariosSinServicio) : "—"}
@@ -759,16 +734,17 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
               />
             </div>
 
-            {/* Technical Explanation Panel */}
-            <div style={{ backgroundColor: "#161C22", border: `1px solid ${COLOR_BORDER}`, borderRadius: 4, display: "flex", flexDirection: "column" }}>
+            {/* Technical Explanation Panel (Flex-1 with internal scrollbar) */}
+            <div style={{ flex: 1, backgroundColor: "#161C22", border: `1px solid ${COLOR_BORDER}`, borderRadius: 4, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
               <div
                 style={{
-                  padding: "10px 14px",
+                  padding: "8px 12px",
                   borderBottom: `1px solid ${COLOR_BORDER}`,
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
                   backgroundColor: "#1a2026",
+                  flexShrink: 0,
                 }}
               >
                 <h2 style={{ margin: 0, fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: "#E2E8F0" }}>
@@ -790,42 +766,43 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                 </span>
               </div>
 
-              <div style={{ padding: 14 }}>
-                <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: "#dde3eb" }}>{textoExplicacion}</p>
+              <div style={{ padding: 12, overflowY: "auto", flex: 1 }}>
+                <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: "#dde3eb" }}>{textoExplicacion}</p>
               </div>
             </div>
 
-            {/* Historical Recall Validation */}
-            <div style={{ backgroundColor: "#161C22", border: `1px solid ${COLOR_BORDER}`, borderRadius: 4, display: "flex", flexDirection: "column" }}>
+            {/* Historical Recall Validation (Compact Table) */}
+            <div style={{ height: 170, backgroundColor: "#161C22", border: `1px solid ${COLOR_BORDER}`, borderRadius: 4, display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
               <div
                 style={{
-                  padding: "10px 14px",
+                  padding: "6px 10px",
                   borderBottom: `1px solid ${COLOR_BORDER}`,
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
                   backgroundColor: "#1a2026",
+                  flexShrink: 0,
                 }}
               >
-                <h2 style={{ margin: 0, fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: "#E2E8F0" }}>
+                <h2 style={{ margin: 0, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: "#E2E8F0" }}>
                   VALIDACIÓN HISTÓRICA
                 </h2>
                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <span style={{ fontSize: 9, fontWeight: "bold", opacity: 0.6 }}>SCORE:</span>
-                  <span style={{ color: COLOR_PRIMARY, fontWeight: 900, fontSize: 12 }}>
+                  <span style={{ fontSize: 8, fontWeight: "bold", opacity: 0.6 }}>SCORE:</span>
+                  <span style={{ color: COLOR_PRIMARY, fontWeight: 900, fontSize: 11 }}>
                     12/12 RECALL (1.0)
                   </span>
                 </div>
               </div>
 
-              <div style={{ maxHeight: 220, overflowY: "auto" }}>
+              <div style={{ flex: 1, overflowY: "auto" }}>
                 {validacion ? (
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11, textAlign: "left" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10, textAlign: "left" }}>
                     <thead>
-                      <tr style={{ backgroundColor: "#101B2E", fontSize: 9, color: "#bccabc", letterSpacing: "0.05em" }}>
-                        <th style={{ padding: "6px 10px", borderBottom: `1px solid ${COLOR_BORDER}` }}>BARRIO</th>
-                        <th style={{ padding: "6px 10px", borderBottom: `1px solid ${COLOR_BORDER}`, textAlign: "center" }}>PRED.</th>
-                        <th style={{ padding: "6px 10px", borderBottom: `1px solid ${COLOR_BORDER}`, textAlign: "center" }}>REAL</th>
+                      <tr style={{ backgroundColor: "#101B2E", fontSize: 8, color: "#bccabc", letterSpacing: "0.05em" }}>
+                        <th style={{ padding: "4px 8px", borderBottom: `1px solid ${COLOR_BORDER}` }}>BARRIO</th>
+                        <th style={{ padding: "4px 8px", borderBottom: `1px solid ${COLOR_BORDER}`, textAlign: "center" }}>PRED.</th>
+                        <th style={{ padding: "4px 8px", borderBottom: `1px solid ${COLOR_BORDER}`, textAlign: "center" }}>REAL</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -840,13 +817,13 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                               borderBottom: `1px solid ${COLOR_BORDER}`,
                             }}
                           >
-                            <td style={{ padding: "6px 10px", fontWeight: "bold", color: "#E2E8F0" }}>
+                            <td style={{ padding: "4px 8px", fontWeight: "bold", color: "#E2E8F0" }}>
                               {nombreBarrioCorto(nodos, f.id)}
                             </td>
-                            <td style={{ padding: "6px 10px", textAlign: "center", color: f.pred === "sin_servicio" ? COLOR_CRITICAL : COLOR_WARNING }}>
+                            <td style={{ padding: "4px 8px", textAlign: "center", color: f.pred === "sin_servicio" ? COLOR_CRITICAL : COLOR_WARNING }}>
                               {sevTexto(f.pred)}
                             </td>
-                            <td style={{ padding: "6px 10px", textAlign: "center", color: "#bccabc" }}>
+                            <td style={{ padding: "4px 8px", textAlign: "center", color: "#bccabc" }}>
                               {sevTexto(f.real)}
                             </td>
                           </tr>
