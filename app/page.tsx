@@ -643,33 +643,7 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
             )}
           </aside>
 
-          {/* Floating Re-open Button when Left Sidebar is Closed */}
-          {!menuIzquierdoAbierto && (
-            <button
-              onClick={() => setMenuIzquierdoAbierto(true)}
-              title="Abrir panel de escenarios"
-              style={{
-                position: "absolute",
-                left: 10,
-                top: 70,
-                zIndex: 40,
-                backgroundColor: "rgba(14, 20, 26, 0.95)",
-                border: `1px solid ${COLOR_PRIMARY}`,
-                color: COLOR_PRIMARY,
-                padding: "8px 12px",
-                borderRadius: 4,
-                cursor: "pointer",
-                fontWeight: "bold",
-                fontSize: 11,
-                boxShadow: "0 4px 14px rgba(0,0,0,0.6)",
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              <span>▶ ESCENARIOS</span>
-            </button>
-          )}
+
 
           {/* Center Column: GIS Map Topology Viewport (flex-1) */}
           <main style={{ flex: 1, display: "flex", flexDirection: "column", backgroundColor: COLOR_BG, position: "relative", overflow: "hidden" }}>
