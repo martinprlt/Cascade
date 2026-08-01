@@ -14,9 +14,9 @@ test("carga el dashboard con la red y las metricas de esc-01", async ({ page }) 
   await expect(page.getByText("15", { exact: true }).first()).toBeVisible();
 
   await expect(page.getByText("DETERMINÍSTICO")).toBeVisible();
-  await expect(page.getByText("12/12 RECALL (1.0)")).toBeVisible();
-  await expect(page.getByText("No Service (3)")).toBeVisible();
-  await expect(page.getByText("Low Pressure (9)")).toBeVisible();
+  await expect(page.getByText("RECALL 12/12 (1.0)")).toBeVisible();
+  await expect(page.getByText("Sin servicio (3)")).toBeVisible();
+  await expect(page.getByText("Baja presión (9)")).toBeVisible();
 });
 
 test("simula un escenario y muestra la maniobra recomendada", async ({ page }) => {

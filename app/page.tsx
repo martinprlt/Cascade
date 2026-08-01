@@ -279,7 +279,7 @@ export default function Home() {
               fontFamily: "monospace",
             }}
           >
-            {resultado ? `${resultado.duracionMs.toFixed(1)}ms LATENCY` : "LIVE LATENCY"}
+            {resultado ? `${resultado.duracionMs.toFixed(1)}ms DE LATENCIA` : "LATENCIA EN VIVO"}
           </div>
           <span className="material-symbols-outlined" style={{ color: "#bccabc", cursor: "pointer", fontSize: 20 }}>
             timer
@@ -373,7 +373,7 @@ export default function Home() {
                 </div>
                 <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
                   <span style={{ fontSize: 10, fontWeight: "bold", opacity: 0.8 }}>
-                    {ahorro ? `AHORRO $${formatoNumero(ahorro)}` : "CONFIDENCE: 98.4%"}
+                    {ahorro ? `AHORRO $${formatoNumero(ahorro)}` : `COSTO: $${formatoNumero(mejorManiobra.metricas.costoMitigacionARS)}`}
                   </span>
                   <button
                     onClick={() => void simular("esc-05")}
@@ -435,7 +435,7 @@ export default function Home() {
                 <span className="material-symbols-outlined" style={{ fontSize: 16, color: COLOR_PRIMARY }}>
                   map
                 </span>
-                GIS NETWORK TOPOLOGY | LIVE OVERLAY
+                GIS TOPOLOGÍA DE RED | OVERLAY EN VIVO
               </h2>
 
               <div style={{ display: "flex", gap: 16, fontSize: 11, fontWeight: "bold" }}>
@@ -445,11 +445,11 @@ export default function Home() {
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: COLOR_WARNING }}></span>
-                  <span>Low Pressure ({conteos.baja})</span>
+                  <span>Baja presión ({conteos.baja})</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: COLOR_CRITICAL }}></span>
-                  <span>No Service ({conteos.sin})</span>
+                  <span>Sin servicio ({conteos.sin})</span>
                 </div>
               </div>
             </div>
@@ -558,9 +558,9 @@ export default function Home() {
                   VALIDACIÓN HISTÓRICA (DIC-2024)
                 </h2>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ fontSize: 10, fontWeight: "bold", opacity: 0.6 }}>SCORE:</span>
+                  <span style={{ fontSize: 10, fontWeight: "bold", opacity: 0.6 }}>RECALL:</span>
                   <span style={{ color: COLOR_PRIMARY, fontWeight: 900, fontSize: 14 }}>
-                    {validacion ? `${validacion.esperado.sin_servicio.length + validacion.esperado.baja_presion.length}/${validacion.esperado.sin_servicio.length + validacion.esperado.baja_presion.length} RECALL (1.0)` : "—"}
+                    {validacion ? `RECALL ${validacion.esperado.sin_servicio.length + validacion.esperado.baja_presion.length}/${validacion.esperado.sin_servicio.length + validacion.esperado.baja_presion.length} (1.0)` : "—"}
                   </span>
                 </div>
               </div>
