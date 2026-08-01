@@ -232,7 +232,7 @@
     {
       "id": "dist-oeste",
       "nombre": "Distribuidor zona oeste",
-      "tipo": "valvula",
+      "tipo": "acueducto",
       "subTipo": "distribuidor",
       "zona": "oeste",
       "estado": "activo",
@@ -242,7 +242,7 @@
     {
       "id": "dist-sur",
       "nombre": "Distribuidor zona sur",
-      "tipo": "valvula",
+      "tipo": "acueducto",
       "subTipo": "distribuidor",
       "zona": "sur",
       "estado": "activo",
@@ -252,7 +252,7 @@
     {
       "id": "dist-este",
       "nombre": "Distribuidor zona este",
-      "tipo": "valvula",
+      "tipo": "acueducto",
       "subTipo": "distribuidor",
       "zona": "este",
       "estado": "activo",

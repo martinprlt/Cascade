@@ -35,7 +35,7 @@ export function aplicarMutaciones(red: RedDeAgua, mutaciones: Mutacion[]): void 
       case "cierre":
         nodo.estado = "cerrado";
         for (const a of red.aristas) {
-          if (a.viaValvula === m.nodo || (a.from === m.nodo && nodo.tipo === "valvula") || (a.to === m.nodo && nodo.tipo === "valvula")) {
+          if (a.viaValvula === m.nodo || (a.from === m.nodo && nodo.tipo === "valvula")) {
             a.estado = "cerrada";
           }
         }
@@ -44,7 +44,7 @@ export function aplicarMutaciones(red: RedDeAgua, mutaciones: Mutacion[]): void 
       case "apertura":
         nodo.estado = "activo";
         for (const a of red.aristas) {
-          if (a.viaValvula === m.nodo || (a.from === m.nodo && nodo.tipo === "valvula") || (a.to === m.nodo && nodo.tipo === "valvula")) {
+          if (a.viaValvula === m.nodo || (a.from === m.nodo && nodo.tipo === "valvula")) {
             a.estado = "abierta";
           }
         }
