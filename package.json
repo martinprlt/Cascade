@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node -e \"process.stdin.resume(); import('./node_modules/next/dist/bin/next')\" dev",
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
