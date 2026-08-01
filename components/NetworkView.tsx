@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useCallback, type MouseEvent, type WheelEvent } from "react";
-import type { Arista, Mutacion, Nodo, Severidad } from "../lib/types";
+import { useState, useRef, useCallback, type JSX, type MouseEvent, type WheelEvent } from "react";
+import type { Arista, Mutacion, Nodo, Severidad, TipoNodo } from "../lib/types";
 
 export interface NetworkViewProps {
   nodos: Nodo[];
@@ -20,13 +20,55 @@ const COLORES_SEVERIDAD: Record<Severidad, string> = {
   normal: "#12B76A",
 };
 
-const COLOR_NODO_BASE: Partial<Record<Nodo["tipo"], string>> = {
+const COLOR_NODO_BASE: Record<TipoNodo, string> = {
   acueducto: "#818CF8",
   perforacion: "#38BDF8",
   tanque: "#2DD4BF",
   bomba: "#34D399",
   valvula: "#FBBF24",
   barrio: "#94A3B8",
+};
+
+const INFO_TIPO_NODO: Record<
+  TipoNodo,
+  { titulo: string; descripcion: string; iconoMaterial: string; accionFalla: string }
+> = {
+  barrio: {
+    titulo: "Hogares / Barrio Residencial",
+    descripcion: "Punto de demanda final de agua potable para familias y comercios.",
+    iconoMaterial: "home",
+    accionFalla: "Interrupción Local de Red Doméstica",
+  },
+  perforacion: {
+    titulo: "Pozo / Perforación Subterránea",
+    descripcion: "Fuente de extracción de napas subterráneas. Al fallar reduce la producción m³/h.",
+    iconoMaterial: "water_drop",
+    accionFalla: "Falla / Parada de Bomba de Pozo",
+  },
+  acueducto: {
+    titulo: "Acueducto Troncal",
+    descripcion: "Canal o tubería de alta capacidad que transporta agua en bloque.",
+    iconoMaterial: "pipeline",
+    accionFalla: "Rotura / Colapso de Acueducto Troncal",
+  },
+  tanque: {
+    titulo: "Tanque de Reserva",
+    descripcion: "Cisterna de almacenamiento y regulación de presión por gravedad.",
+    iconoMaterial: "water_full",
+    accionFalla: "Vaciado / Falla de Tanque de Reserva",
+  },
+  bomba: {
+    titulo: "Estación de Rebombeo",
+    descripcion: "Impulsión eléctrica para elevar presión a zonas altas.",
+    iconoMaterial: "bolt",
+    accionFalla: "Falla Eléctrica en Rebombeo",
+  },
+  valvula: {
+    titulo: "Válvula de Control / Sectorización",
+    descripcion: "Mecanismo para abrir, cerrar o derivar caudales en la red.",
+    iconoMaterial: "tune",
+    accionFalla: "Cierre / Bloqueo de Válvula",
+  },
 };
 
 const POSICIONES: Record<string, { x: number; y: number }> = {
@@ -112,7 +154,7 @@ export default function NetworkView({
   const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [is3D, setIs3D] = useState<boolean>(false);
   const [nodoSeleccionado, setNodoSeleccionado] = useState<Nodo | null>(null);
-  const [estadoSimulado, setEstadoSimulado] = useState<"fallado" | "activo">("fallado");
+  const [accionSimulada, setAccionSimulada] = useState<"falla" | "cierre" | "apertura">("falla");
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -142,14 +184,71 @@ export default function NetworkView({
     setZoom(1.0);
   }, []);
 
-  const ejecutarSimulacionNodo = (nodo: Nodo, estadoTarget: "fallado" | "activo") => {
+  const ejecutarSimulacionNodo = (nodo: Nodo, accion: "falla" | "cierre" | "apertura") => {
     if (!onSimularCustom) return;
     const mutacion: Mutacion = {
       nodo: nodo.id,
-      accion: estadoTarget === "fallado" ? "falla" : "apertura",
+      accion,
     };
-    const nombre = `Falla personalizada en ${nodo.nombre}`;
+    const info = INFO_TIPO_NODO[nodo.tipo];
+    const nombre = `${info?.accionFalla ?? "Falla en"} ${nodo.nombre}`;
     onSimularCustom([mutacion], nombre);
+  };
+
+  const renderSimboloNodo = (n: Nodo, fill: string, contorno: string, x: number, y: number): JSX.Element => {
+    switch (n.tipo) {
+      case "barrio":
+        return (
+          <g transform={`translate(${x - 14}, ${y - 14})`}>
+            <circle cx="14" cy="14" r="14" fill={fill} stroke={contorno} strokeWidth="1.5" />
+            {/* House Roof & Body Vector Path */}
+            <path d="M 14 6 L 6 13 L 8 13 L 8 21 L 20 21 L 20 13 L 22 13 Z" fill="#FFFFFF" opacity={0.9} />
+            <rect x="12" y="16" width="4" height="5" fill={fill} />
+          </g>
+        );
+      case "perforacion":
+        return (
+          <g transform={`translate(${x - 12}, ${y - 12})`}>
+            <circle cx="12" cy="12" r="12" fill={fill} stroke={contorno} strokeWidth="1.5" />
+            {/* Water Drop Symbol */}
+            <path d="M 12 5 C 9 9, 7 12, 7 15 A 5 5 0 0 0 17 15 C 17 12, 15 9, 12 5 Z" fill="#FFFFFF" />
+          </g>
+        );
+      case "acueducto":
+        return (
+          <g transform={`translate(${x - 15}, ${y - 15})`}>
+            <rect x="2" y="2" width="26" height="26" rx="4" fill={fill} stroke={contorno} strokeWidth="1.5" />
+            <path d="M 6 15 L 22 15 M 17 10 L 22 15 L 17 20" stroke="#FFFFFF" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          </g>
+        );
+      case "tanque":
+        return (
+          <g transform={`translate(${x - 14}, ${y - 14})`}>
+            <rect x="3" y="3" width="22" height="22" rx="3" fill={fill} stroke={contorno} strokeWidth="1.5" />
+            <rect x="7" y="12" width="14" height="9" fill="#FFFFFF" opacity={0.85} rx="1" />
+            <line x1="7" y1="9" x2="21" y2="9" stroke="#FFFFFF" strokeWidth="2" />
+          </g>
+        );
+      case "bomba":
+        return (
+          <g transform={`translate(${x - 13}, ${y - 13})`}>
+            <circle cx="13" cy="13" r="13" fill={fill} stroke={contorno} strokeWidth="1.5" />
+            {/* Turbine / Pump Blade Icon */}
+            <circle cx="13" cy="13" r="5" fill="#FFFFFF" />
+            <path d="M 13 4 L 13 22 M 4 13 L 22 13" stroke={fill} strokeWidth="2" />
+          </g>
+        );
+      case "valvula":
+        return (
+          <g transform={`translate(${x - 13}, ${y - 13})`}>
+            {/* Valve Diamond Shape */}
+            <polygon points="13,2 24,13 13,24 2,13" fill={fill} stroke={contorno} strokeWidth="1.5" />
+            <circle cx="13" cy="13" r="3.5" fill="#FFFFFF" />
+          </g>
+        );
+      default:
+        return <circle cx={x} cy={y} r={10} fill={fill} stroke={contorno} strokeWidth="1.5" />;
+    }
   };
 
   return (
@@ -171,7 +270,7 @@ export default function NetworkView({
         userSelect: "none",
       }}
     >
-      {/* GIS HUD Control Panel Bar */}
+      {/* GIS HUD Control Panel Bar & Legend */}
       <div
         style={{
           position: "absolute",
@@ -186,7 +285,7 @@ export default function NetworkView({
       >
         <div
           style={{
-            background: "rgba(14,20,26,0.92)",
+            background: "rgba(14,20,26,0.95)",
             border: "1px solid #3d4a3f",
             padding: "4px 10px",
             fontSize: 10,
@@ -202,8 +301,33 @@ export default function NetworkView({
           <span style={{ width: 7, height: 7, backgroundColor: "#51df8e", borderRadius: "50%", display: "inline-block" }}></span>
           SYSTEM: LA_RIOJA_GIS_OVERLAY
         </div>
-        <div style={{ background: "rgba(14,20,26,0.92)", border: "1px solid #3d4a3f", padding: "4px 10px", fontSize: 10, fontFamily: "monospace", color: "#bccabc", borderRadius: 2 }}>
-          LAT: -29.412 | LON: -66.855 | ZOOM: {(zoom * 100).toFixed(0)}%
+
+        {/* Node Type Legend */}
+        <div style={{ background: "rgba(14,20,26,0.92)", border: "1px solid #3d4a3f", padding: "6px 10px", borderRadius: 2, display: "flex", flexWrap: "wrap", gap: 10, fontSize: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.barrio }}>home</span>
+            <span>Hogares</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.perforacion }}>water_drop</span>
+            <span>Pozo</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.acueducto }}>pipeline</span>
+            <span>Acueducto</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.tanque }}>water_full</span>
+            <span>Tanque</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.bomba }}>bolt</span>
+            <span>Bomba</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.valvula }}>tune</span>
+            <span>Válvula</span>
+          </div>
         </div>
       </div>
 
@@ -254,7 +378,7 @@ export default function NetworkView({
         </button>
       </div>
 
-      {/* Interactive Node Property Inspector & Custom Scenario Launcher Drawer */}
+      {/* Interactive Node Property Inspector Drawer tailored per node type */}
       {nodoSeleccionado && (
         <div
           style={{
@@ -263,10 +387,10 @@ export default function NetworkView({
             left: 16,
             zIndex: 40,
             backgroundColor: "rgba(16, 27, 46, 0.98)",
-            border: "1px solid #51df8e",
+            border: `1px solid ${COLOR_NODO_BASE[nodoSeleccionado.tipo]}`,
             padding: 16,
             borderRadius: 6,
-            width: 320,
+            width: 330,
             color: "#E2E8F0",
             fontSize: 12,
             boxShadow: "0 12px 32px rgba(0,0,0,0.8)",
@@ -274,60 +398,91 @@ export default function NetworkView({
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, borderBottom: "1px solid #1E293B", paddingBottom: 6 }}>
-            <span style={{ fontWeight: 900, fontSize: 14, color: "#51df8e" }}>{nodoSeleccionado.nombre}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 18, color: COLOR_NODO_BASE[nodoSeleccionado.tipo] }}>
+                {INFO_TIPO_NODO[nodoSeleccionado.tipo]?.iconoMaterial}
+              </span>
+              <span style={{ fontWeight: 900, fontSize: 14, color: "#E2E8F0" }}>{nodoSeleccionado.nombre}</span>
+            </div>
             <button onClick={() => setNodoSeleccionado(null)} style={{ background: "none", border: "none", color: "#94A3B8", cursor: "pointer", fontSize: 16 }}>✕</button>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
-            <div>Tipo: <strong>{nodoSeleccionado.tipo.toUpperCase()}</strong> | Zona: <strong>{nodoSeleccionado.zona.toUpperCase()}</strong></div>
-            {nodoSeleccionado.usuarios ? <div>Población Usuaria: <strong>{nodoSeleccionado.usuarios.toLocaleString("es-AR")} hab.</strong></div> : null}
-            {nodoSeleccionado.caudalHorarioM3 ? <div>Caudal Nominal: <strong>{nodoSeleccionado.caudalHorarioM3} m³/h</strong></div> : null}
-            {nodoSeleccionado.m3Dia ? <div>Demanda Estimada: <strong>{nodoSeleccionado.m3Dia} m³/día</strong></div> : null}
-            {nodoSeleccionado.descripcion ? <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>{nodoSeleccionado.descripcion}</div> : null}
+          <div style={{ fontSize: 11, color: COLOR_NODO_BASE[nodoSeleccionado.tipo], fontWeight: "bold", marginBottom: 4 }}>
+            {INFO_TIPO_NODO[nodoSeleccionado.tipo]?.titulo}
           </div>
 
-          {/* Interactive Simulation Controls */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
+            <div style={{ fontSize: 11, color: "#bccabc" }}>{INFO_TIPO_NODO[nodoSeleccionado.tipo]?.descripcion}</div>
+            <div>Zona: <strong>{nodoSeleccionado.zona.toUpperCase()}</strong></div>
+            {nodoSeleccionado.usuarios ? <div>Hogares / Población: <strong>{nodoSeleccionado.usuarios.toLocaleString("es-AR")} hab.</strong></div> : null}
+            {nodoSeleccionado.caudalHorarioM3 ? <div>Caudal Nominal: <strong>{nodoSeleccionado.caudalHorarioM3} m³/h</strong></div> : null}
+            {nodoSeleccionado.m3Dia ? <div>Demanda Estimada: <strong>{nodoSeleccionado.m3Dia} m³/día</strong></div> : null}
+          </div>
+
+          {/* Tailored Failure Simulation Controls */}
           <div style={{ backgroundColor: "#161C22", border: "1px solid #1E293B", borderRadius: 4, padding: 10 }}>
             <div style={{ fontSize: 10, fontWeight: 800, color: "#51df8e", letterSpacing: "0.05em", marginBottom: 6 }}>
-              CREAR ESCENARIO PERSONALIZADO EN VIVO
+              SIMULACIÓN DE IMPACTO ESPECÍFICO DE TIPO
             </div>
-            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+
+            <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
               <button
-                onClick={() => setEstadoSimulado("fallado")}
+                onClick={() => setAccionSimulada("falla")}
                 style={{
                   flex: 1,
-                  padding: "6px 8px",
-                  fontSize: 11,
+                  padding: "6px 6px",
+                  fontSize: 10,
                   fontWeight: "bold",
                   borderRadius: 2,
                   border: "none",
-                  backgroundColor: estadoSimulado === "fallado" ? "#D92D20" : "#1a2026",
+                  backgroundColor: accionSimulada === "falla" ? "#D92D20" : "#1a2026",
                   color: "#E2E8F0",
                   cursor: "pointer",
                 }}
               >
-                🔴 FALLADO
+                🔴 FALLA / CORTE
               </button>
-              <button
-                onClick={() => setEstadoSimulado("activo")}
-                style={{
-                  flex: 1,
-                  padding: "6px 8px",
-                  fontSize: 11,
-                  fontWeight: "bold",
-                  borderRadius: 2,
-                  border: "none",
-                  backgroundColor: estadoSimulado === "activo" ? "#12B76A" : "#1a2026",
-                  color: "#E2E8F0",
-                  cursor: "pointer",
-                }}
-              >
-                🟢 ACTIVO
-              </button>
+              {nodoSeleccionado.tipo === "valvula" && (
+                <>
+                  <button
+                    onClick={() => setAccionSimulada("cierre")}
+                    style={{
+                      flex: 1,
+                      padding: "6px 6px",
+                      fontSize: 10,
+                      fontWeight: "bold",
+                      borderRadius: 2,
+                      border: "none",
+                      backgroundColor: accionSimulada === "cierre" ? "#F79009" : "#1a2026",
+                      color: "#E2E8F0",
+                      cursor: "pointer",
+                    }}
+                  >
+                    🟠 CIERRE
+                  </button>
+                  <button
+                    onClick={() => setAccionSimulada("apertura")}
+                    style={{
+                      flex: 1,
+                      padding: "6px 6px",
+                      fontSize: 10,
+                      fontWeight: "bold",
+                      borderRadius: 2,
+                      border: "none",
+                      backgroundColor: accionSimulada === "apertura" ? "#12B76A" : "#1a2026",
+                      color: "#E2E8F0",
+                      cursor: "pointer",
+                    }}
+                  >
+                    🟢 APERTURA
+                  </button>
+                </>
+              )}
             </div>
+
             <button
               onClick={() => {
-                ejecutarSimulacionNodo(nodoSeleccionado, estadoSimulado);
+                ejecutarSimulacionNodo(nodoSeleccionado, accionSimulada);
                 setNodoSeleccionado(null);
               }}
               style={{
@@ -343,7 +498,7 @@ export default function NetworkView({
                 boxShadow: "0 4px 12px rgba(81,223,142,0.3)",
               }}
             >
-              SIMULAR PROPAGACIÓN EN VIVO 🚀
+              SIMULAR {accionSimulada.toUpperCase()} DE {nodoSeleccionado.tipo.toUpperCase()} 🚀
             </button>
           </div>
         </div>
@@ -450,7 +605,7 @@ export default function NetworkView({
               );
             })}
 
-            {/* Nodes */}
+            {/* Distinct Node Vector Symbols */}
             {nodos.map((n) => {
               const p = posicionNodo(n);
               const sev = severidad?.[n.id];
@@ -467,27 +622,28 @@ export default function NetworkView({
                   }}
                   style={{ cursor: "pointer" }}
                 >
-                  {is3D && <ellipse cx={p.x} cy={p.y + 12} rx={12} ry={6} fill="#000000" opacity={0.6} />}
+                  {is3D && <ellipse cx={p.x} cy={p.y + 14} rx={14} ry={7} fill="#000000" opacity={0.6} />}
 
                   {sev === "sin_servicio" && (
-                    <circle cx={p.x} cy={p.y} r={20} fill="none" stroke="#D92D20" strokeWidth={1.5} opacity={0.7}>
-                      <animate attributeName="r" values="12;24;12" dur="2s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite" />
+                    <circle cx={p.x} cy={p.y} r={22} fill="none" stroke="#D92D20" strokeWidth={1.5} opacity={0.75}>
+                      <animate attributeName="r" values="14;26;14" dur="2s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="0.9;0.2;0.9" dur="2s" repeatCount="indefinite" />
                     </circle>
                   )}
                   {sev === "baja_presion" && (
-                    <circle cx={p.x} cy={p.y} r={16} fill="none" stroke="#F79009" strokeWidth={1} opacity={0.5}>
-                      <animate attributeName="r" values="11;18;11" dur="3s" repeatCount="indefinite" />
+                    <circle cx={p.x} cy={p.y} r={18} fill="none" stroke="#F79009" strokeWidth={1} opacity={0.5}>
+                      <animate attributeName="r" values="12;20;12" dur="3s" repeatCount="indefinite" />
                     </circle>
                   )}
 
-                  <circle cx={p.x} cy={p.y} r={n.tipo === "barrio" ? 11 : 8} fill={fill} stroke={contorno} strokeWidth={1.5} />
+                  {/* Render Custom Vector Icon per Node Type */}
+                  {renderSimboloNodo(n, fill, contorno, p.x, p.y)}
 
                   <title>{n.nombre}</title>
                   {etiquetas && n.tipo === "barrio" && (
                     <text
                       x={p.x}
-                      y={p.y + 24}
+                      y={p.y + 26}
                       textAnchor="middle"
                       fontSize={10}
                       fontWeight="bold"
