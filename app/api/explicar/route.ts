@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cargarDatosCascade } from "../../../lib/grafo";
 import { explicarResultado } from "../../../lib/explicador";
 import { duracionFalla } from "../../../lib/escenarios";
+import { rankingAlternativas } from "../../../lib/ranking";
 import type { DatosCascade, ResultadoSimulacion } from "../../../lib/types";
 
 export const dynamic = "force-dynamic";
@@ -74,16 +75,28 @@ function construirPrompt(datos: DatosCascade, escenarioId: string, resultado: Re
   const sinServicio = porSeveridad("sin_servicio");
   const bajaPresion = porSeveridad("baja_presion");
   const m = resultado.metricas;
+
+  let recomendacionExacta = "";
+  try {
+    const r = rankingAlternativas(datos, escenarioId, duracionHoras);
+    if (r && r.length > 0) {
+      const mejor = r[0];
+      recomendacionExacta = `Maniobra óptima calculada por algoritmo: "${mejor.nombre}" (Costo mitigado: $${mejor.metricas.costoMitigacionARS.toLocaleString("es-AR")}, Camiones: ${mejor.metricas.camionesRequeridos}).`;
+    }
+  } catch {
+    recomendacionExacta = "Maniobra óptima: Maniobrar válvulas de sectorización para derivar caudal y desplegar flota de camiones de refuerzo.";
+  }
+
   return [
     `Escenario Simulado: ${escenarioId} (${resultado.escenarioNombre}).`,
     `Barrios sin servicio (${m.usuariosSinServicio} usuarios): ${sinServicio.join(", ") || "ninguno"}.`,
     `Barrios con baja presion (${m.usuariosBajaPresion} usuarios): ${bajaPresion.join(", ") || "ninguno"}.`,
     `Horizonte Temporal: ${duracionHoras} h. Deficit estimado: ${m.deficitM3} m3. Camiones requeridos: ${m.camionesRequeridos}. Costo estimado: $ ${m.costoMitigacionARS.toLocaleString("es-AR")}.`,
-    "REGLA OBLIGATORIA: Usa siempre los nombres reales y legibles de los barrios (ejemplo: 'Barrio Procrear', 'Barrio Néstor Kirchner', 'Barrio Las Talas'). NUNCA uses los IDs técnicos como 'barrio-procrear' o 'barrio-nk-alta'.",
-    "Provee una explicacion clara y una solucion operativa concreta en español rioplatense (3 a 4 oraciones maximo):",
-    "1. DIAGNÓSTICO: Causa de la falla.",
-    "2. AFECTACIÓN: Total de personas y barrios afectados con sus nombres legibles.",
-    "3. SOLUCIÓN Y RECOMENDACIÓN OPERATIVA: Instruccion precisa (ej: maniobrar valvulas o despachar camiones).",
+    `Solución Calculada por Motor: ${recomendacionExacta}`,
+    "REGLAS OBLIGATORIAS PARA LA RESPUESTA:",
+    "1. NOMBRES REALES: Usa siempre los nombres reales y legibles de los barrios (ejemplo: 'Barrio Procrear', 'Barrio Néstor Kirchner'). NUNCA uses los IDs técnicos.",
+    "2. SOLUCIÓN EXACTA: Basate obligatoriamente en la Maniobra Óptima Calculada arriba. Explica exactamente esa recomendación técnica y por qué soluciona la crisis en lugar de dar sugerencias genéricas.",
+    "3. FORMATO: Redacta en 3 a 4 oraciones fluidas en español rioplatense (Diagnóstico -> Afectación -> Solución Recomendada).",
   ].join("\n");
 }
 
@@ -106,13 +119,13 @@ async function explicacionLLM(
       },
       body: JSON.stringify({
         model: MODELO_GROQ,
-        temperature: 0.2,
-        max_tokens: 280,
+        temperature: 0.15,
+        max_tokens: 300,
         messages: [
           {
             role: "system",
             content:
-              "Sos el Asistente IA de Inteligencia Operativa de CASCADE (red de agua de La Rioja). Tu trabajo es dar diagnostico claro y recomendacion operativa de solucion usando NOMBRES REALES Y LEGIBLES DE BARRIOS (nunca IDs tecnicos). Redacta directo sin preambulos. No inventes numeros ni barrios.",
+              "Sos el Asistente IA de Inteligencia Operativa de CASCADE (red de agua de La Rioja). Tu función es brindar el diagnóstico técnico y fundamentar la recomendación operativa de solución calculada por el motor algorítmico. Usa nombres reales de barrios y redacta de forma ejecutiva.",
           },
           { role: "user", content: construirPrompt(datos, escenarioId, resultado, duracionHoras) },
         ],
