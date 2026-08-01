@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import NetworkView from "../components/NetworkView";
 import type {
   Arista,
+  Mutacion,
   Nodo,
   ResultadoManiobra,
   ResultadoSimulacion,
@@ -101,6 +102,9 @@ export default function Home() {
   const [aristas, setAristas] = useState<Arista[]>([]);
   const [escenarios, setEscenarios] = useState<EscenarioResumen[]>([]);
   const [seleccionado, setSeleccionado] = useState<string>("esc-01");
+  const [esCustom, setEsCustom] = useState<boolean>(false);
+  const [nombreCustomActual, setNombreCustomActual] = useState<string>("");
+
   const [resultado, setResultado] = useState<ResultadoSimulacion | null>(null);
   const [ranking, setRanking] = useState<RespuestaRanking | null>(null);
   const [explicacion, setExplicacion] = useState<Explicacion | null>(null);
@@ -114,6 +118,7 @@ export default function Home() {
     setCargando(true);
     setError(null);
     setSeleccionado(escenarioId);
+    setEsCustom(false);
     setExplicacion(null);
     try {
       const resSimular = await fetch("/api/simular", {
@@ -139,6 +144,48 @@ export default function Home() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ escenarioId, resultado: r }),
+        });
+        const cuerpo = (await resExplicar.json()) as RespuestaExplicar;
+        if (typeof cuerpo.explicacion === "string") {
+          setExplicacion({ texto: cuerpo.explicacion, fuente: cuerpo.fuente === "ia" ? "ia" : "deterministico" });
+        } else {
+          setExplicacion({ texto: r.explicacion, fuente: "deterministico" });
+        }
+      } catch {
+        setExplicacion({ texto: r.explicacion, fuente: "deterministico" });
+      } finally {
+        setExplicando(false);
+      }
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setCargando(false);
+    }
+  }, []);
+
+  const simularCustom = useCallback(async (mutaciones: Mutacion[], nombreCustom: string) => {
+    setCargando(true);
+    setError(null);
+    setEsCustom(true);
+    setNombreCustomActual(nombreCustom);
+    setExplicacion(null);
+    try {
+      const resSimular = await fetch("/api/simular", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mutaciones, nombreCustom }),
+      });
+      if (!resSimular.ok) throw new Error(`Error al simular personalizado: HTTP ${resSimular.status}`);
+      const r = (await resSimular.json()) as ResultadoSimulacion;
+      setResultado(r);
+
+      setRanking(null);
+      setExplicando(true);
+      try {
+        const resExplicar = await fetch("/api/explicar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ escenarioId: "custom", resultado: r }),
         });
         const cuerpo = (await resExplicar.json()) as RespuestaExplicar;
         if (typeof cuerpo.explicacion === "string") {
@@ -209,7 +256,7 @@ export default function Home() {
 
   return (
     <div style={{ backgroundColor: COLOR_BG, height: "100vh", width: "100vw", display: "flex", flexDirection: "column", overflow: "hidden", color: "#E2E8F0", fontFamily: "'Inter', sans-serif" }}>
-      {/* 1. Header Navigation Bar */}
+      {/* Header Navigation Bar */}
       <header
         style={{
           height: 56,
@@ -294,10 +341,10 @@ export default function Home() {
         </div>
       </header>
 
-      {/* 2. TAB 1: Main Integrated 3-Column Viewport (Mapa de Red GIS) */}
+      {/* TAB 1: Main Integrated 3-Column Viewport */}
       {tabActiva === "mapa" && (
         <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
-          {/* Left Column: Control Center & Scenario Selector (Width 300px) */}
+          {/* Left Column: Control Center & Scenario Selector */}
           <aside
             style={{
               width: 300,
@@ -316,9 +363,49 @@ export default function Home() {
               <h3 style={{ fontSize: 10, fontWeight: 700, color: "#bccabc", letterSpacing: "0.08em", marginBottom: 12, textTransform: "uppercase" }}>
                 CENTRO DE CONTROL | ESCENARIOS
               </h3>
+
+              {/* Custom Scenario Active Alert Banner */}
+              {esCustom && (
+                <div
+                  style={{
+                    backgroundColor: "rgba(247, 144, 9, 0.15)",
+                    border: `1px solid ${COLOR_WARNING}`,
+                    borderRadius: 4,
+                    padding: 10,
+                    marginBottom: 12,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                  }}
+                >
+                  <span style={{ fontSize: 10, fontWeight: 800, color: COLOR_WARNING, letterSpacing: "0.05em" }}>
+                    ⚡ ESCENARIO PERSONALIZADO EN VIVO
+                  </span>
+                  <span style={{ fontSize: 12, fontWeight: "bold", color: "#E2E8F0" }}>
+                    {nombreCustomActual}
+                  </span>
+                  <button
+                    onClick={() => void simular("esc-01")}
+                    style={{
+                      marginTop: 4,
+                      backgroundColor: COLOR_WARNING,
+                      color: "#000000",
+                      border: "none",
+                      padding: "4px 8px",
+                      fontSize: 10,
+                      fontWeight: 800,
+                      borderRadius: 2,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Restablecer Escenario Base
+                  </button>
+                </div>
+              )}
+
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {escenarios.map((e) => {
-                  const activo = e.id === seleccionado;
+                  const activo = !esCustom && e.id === seleccionado;
                   return (
                     <button
                       key={e.id}
@@ -353,7 +440,7 @@ export default function Home() {
 
             {/* Recommended Action Card */}
             <div style={{ marginTop: 16 }}>
-              {mejorManiobra ? (
+              {mejorManiobra && !esCustom ? (
                 <div
                   style={{
                     backgroundColor: COLOR_PRIMARY,
@@ -411,7 +498,7 @@ export default function Home() {
                 <span className="material-symbols-outlined" style={{ fontSize: 16, color: COLOR_PRIMARY }}>
                   map
                 </span>
-                TOPOLOGÍA GIS LA RIOJA | TIEMPO REAL
+                TOPOLOGÍA GIS LA RIOJA | HACE CLIC EN CUALQUIER NODO PARA SIMULAR SU FALLA
               </h2>
 
               <div style={{ display: "flex", gap: 14, fontSize: 10, fontWeight: "bold" }}>
@@ -431,7 +518,13 @@ export default function Home() {
             </div>
 
             <div style={{ flex: 1, position: "relative", width: "100%", height: "100%" }}>
-              <NetworkView nodos={nodos} aristas={aristas} severidad={resultado?.severidadPorBarrio} etiquetas />
+              <NetworkView
+                nodos={nodos}
+                aristas={aristas}
+                severidad={resultado?.severidadPorBarrio}
+                etiquetas
+                onSimularCustom={(mut, nom) => void simularCustom(mut, nom)}
+              />
               {cargando && (
                 <div
                   style={{
@@ -447,7 +540,7 @@ export default function Home() {
                     zIndex: 35,
                   }}
                 >
-                  Calculando propagación determinista en tiempo real...
+                  Calculando propagación en tiempo real para el nodo seleccionado...
                 </div>
               )}
             </div>
@@ -601,10 +694,9 @@ export default function Home() {
         </div>
       )}
 
-      {/* 3. TAB 2: Escenarios & Ranking View */}
+      {/* TAB 2: Escenarios & Ranking View */}
       {tabActiva === "escenarios" && (
         <div style={{ flex: 1, padding: 24, overflowY: "auto", display: "flex", flexDirection: "column", gap: 24 }}>
-          {/* Header Banner */}
           <div style={{ backgroundColor: COLOR_CARD, border: `1px solid ${COLOR_BORDER}`, borderRadius: 4, padding: 20 }}>
             <h2 style={{ margin: "0 0 8px 0", fontSize: 18, color: COLOR_PRIMARY }}>
               MATRIZ DE ESCENARIOS DE FALLA Y RANKING DE MANIOBRAS
@@ -614,7 +706,6 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Ranking of Mitigation Maneuvers */}
           {ranking?.resultados && ranking.resultados.length > 0 ? (
             <div style={{ backgroundColor: COLOR_CARD, border: `1px solid ${COLOR_BORDER}`, borderRadius: 4, padding: 20 }}>
               <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "#E2E8F0", letterSpacing: "0.05em" }}>
@@ -666,10 +757,9 @@ export default function Home() {
         </div>
       )}
 
-      {/* 4. TAB 3: Historial & Validación View */}
+      {/* TAB 3: Historial & Validación View */}
       {tabActiva === "validacion" && (
         <div style={{ flex: 1, padding: 24, overflowY: "auto", display: "flex", flexDirection: "column", gap: 24 }}>
-          {/* Header Score Card */}
           <div style={{ backgroundColor: COLOR_CARD, border: `1px solid ${COLOR_PRIMARY}`, borderRadius: 4, padding: 24, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <span style={{ fontSize: 11, fontWeight: 800, color: COLOR_PRIMARY, letterSpacing: "0.08em" }}>VALIDACIÓN HISTÓRICA</span>
@@ -687,7 +777,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Detailed Audit Table */}
           <div style={{ backgroundColor: COLOR_CARD, border: `1px solid ${COLOR_BORDER}`, borderRadius: 4, overflow: "hidden" }}>
             <div style={{ padding: "14px 20px", borderBottom: `1px solid ${COLOR_BORDER}`, backgroundColor: "#161c22", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <h3 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: "#E2E8F0", letterSpacing: "0.05em" }}>

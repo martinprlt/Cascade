@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useRef, useCallback, type MouseEvent, type WheelEvent } from "react";
-import type { Arista, Nodo, Severidad } from "../lib/types";
+import type { Arista, Mutacion, Nodo, Severidad } from "../lib/types";
 
 export interface NetworkViewProps {
   nodos: Nodo[];
   aristas: Arista[];
   severidad?: Record<string, Severidad>;
   etiquetas?: boolean;
+  onSimularCustom?: (mutaciones: Mutacion[], nombreCustom: string) => void;
 }
 
 const ANCHO = 1000;
@@ -98,13 +99,20 @@ function etiquetaCorta(nombre: string): string {
   return nombre.replace(/^Barrio\s+/i, "").replace(/\s*\(.*?\)\s*$/g, "");
 }
 
-export default function NetworkView({ nodos, aristas, severidad, etiquetas = true }: NetworkViewProps) {
+export default function NetworkView({
+  nodos,
+  aristas,
+  severidad,
+  etiquetas = true,
+  onSimularCustom,
+}: NetworkViewProps) {
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState<number>(1.0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [is3D, setIs3D] = useState<boolean>(false);
   const [nodoSeleccionado, setNodoSeleccionado] = useState<Nodo | null>(null);
+  const [estadoSimulado, setEstadoSimulado] = useState<"fallado" | "activo">("fallado");
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -133,6 +141,16 @@ export default function NetworkView({ nodos, aristas, severidad, etiquetas = tru
     setPan({ x: 0, y: 0 });
     setZoom(1.0);
   }, []);
+
+  const ejecutarSimulacionNodo = (nodo: Nodo, estadoTarget: "fallado" | "activo") => {
+    if (!onSimularCustom) return;
+    const mutacion: Mutacion = {
+      nodo: nodo.id,
+      accion: estadoTarget === "fallado" ? "falla" : "apertura",
+    };
+    const nombre = `Falla personalizada en ${nodo.nombre}`;
+    onSimularCustom([mutacion], nombre);
+  };
 
   return (
     <div
@@ -236,32 +254,98 @@ export default function NetworkView({ nodos, aristas, severidad, etiquetas = tru
         </button>
       </div>
 
-      {/* Selected Node Details Tooltip Card */}
+      {/* Interactive Node Property Inspector & Custom Scenario Launcher Drawer */}
       {nodoSeleccionado && (
         <div
           style={{
             position: "absolute",
-            bottom: 12,
-            left: 12,
+            bottom: 16,
+            left: 16,
             zIndex: 40,
-            backgroundColor: "rgba(16, 27, 46, 0.95)",
+            backgroundColor: "rgba(16, 27, 46, 0.98)",
             border: "1px solid #51df8e",
-            padding: 12,
-            borderRadius: 4,
-            width: 280,
+            padding: 16,
+            borderRadius: 6,
+            width: 320,
             color: "#E2E8F0",
             fontSize: 12,
-            boxShadow: "0 8px 24px rgba(0,0,0,0.6)",
+            boxShadow: "0 12px 32px rgba(0,0,0,0.8)",
+            backdropFilter: "blur(12px)",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-            <span style={{ fontWeight: "bold", fontSize: 13, color: "#51df8e" }}>{nodoSeleccionado.nombre}</span>
-            <button onClick={() => setNodoSeleccionado(null)} style={{ background: "none", border: "none", color: "#94A3B8", cursor: "pointer", fontSize: 14 }}>✕</button>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, borderBottom: "1px solid #1E293B", paddingBottom: 6 }}>
+            <span style={{ fontWeight: 900, fontSize: 14, color: "#51df8e" }}>{nodoSeleccionado.nombre}</span>
+            <button onClick={() => setNodoSeleccionado(null)} style={{ background: "none", border: "none", color: "#94A3B8", cursor: "pointer", fontSize: 16 }}>✕</button>
           </div>
-          <div>Tipo: <strong>{nodoSeleccionado.tipo.toUpperCase()}</strong> | Zona: <strong>{nodoSeleccionado.zona.toUpperCase()}</strong></div>
-          {nodoSeleccionado.usuarios ? <div>Usuarios: <strong>{nodoSeleccionado.usuarios.toLocaleString("es-AR")}</strong> hab.</div> : null}
-          {nodoSeleccionado.m3Dia ? <div>Demanda: <strong>{nodoSeleccionado.m3Dia} m³/día</strong></div> : null}
-          {nodoSeleccionado.descripcion ? <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 4 }}>{nodoSeleccionado.descripcion}</div> : null}
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 12 }}>
+            <div>Tipo: <strong>{nodoSeleccionado.tipo.toUpperCase()}</strong> | Zona: <strong>{nodoSeleccionado.zona.toUpperCase()}</strong></div>
+            {nodoSeleccionado.usuarios ? <div>Población Usuaria: <strong>{nodoSeleccionado.usuarios.toLocaleString("es-AR")} hab.</strong></div> : null}
+            {nodoSeleccionado.caudalHorarioM3 ? <div>Caudal Nominal: <strong>{nodoSeleccionado.caudalHorarioM3} m³/h</strong></div> : null}
+            {nodoSeleccionado.m3Dia ? <div>Demanda Estimada: <strong>{nodoSeleccionado.m3Dia} m³/día</strong></div> : null}
+            {nodoSeleccionado.descripcion ? <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>{nodoSeleccionado.descripcion}</div> : null}
+          </div>
+
+          {/* Interactive Simulation Controls */}
+          <div style={{ backgroundColor: "#161C22", border: "1px solid #1E293B", borderRadius: 4, padding: 10 }}>
+            <div style={{ fontSize: 10, fontWeight: 800, color: "#51df8e", letterSpacing: "0.05em", marginBottom: 6 }}>
+              CREAR ESCENARIO PERSONALIZADO EN VIVO
+            </div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+              <button
+                onClick={() => setEstadoSimulado("fallado")}
+                style={{
+                  flex: 1,
+                  padding: "6px 8px",
+                  fontSize: 11,
+                  fontWeight: "bold",
+                  borderRadius: 2,
+                  border: "none",
+                  backgroundColor: estadoSimulado === "fallado" ? "#D92D20" : "#1a2026",
+                  color: "#E2E8F0",
+                  cursor: "pointer",
+                }}
+              >
+                🔴 FALLADO
+              </button>
+              <button
+                onClick={() => setEstadoSimulado("activo")}
+                style={{
+                  flex: 1,
+                  padding: "6px 8px",
+                  fontSize: 11,
+                  fontWeight: "bold",
+                  borderRadius: 2,
+                  border: "none",
+                  backgroundColor: estadoSimulado === "activo" ? "#12B76A" : "#1a2026",
+                  color: "#E2E8F0",
+                  cursor: "pointer",
+                }}
+              >
+                🟢 ACTIVO
+              </button>
+            </div>
+            <button
+              onClick={() => {
+                ejecutarSimulacionNodo(nodoSeleccionado, estadoSimulado);
+                setNodoSeleccionado(null);
+              }}
+              style={{
+                width: "100%",
+                backgroundColor: "#51df8e",
+                color: "#00391d",
+                fontWeight: 900,
+                fontSize: 11,
+                padding: "8px 12px",
+                border: "none",
+                borderRadius: 4,
+                cursor: "pointer",
+                boxShadow: "0 4px 12px rgba(81,223,142,0.3)",
+              }}
+            >
+              SIMULAR PROPAGACIÓN EN VIVO 🚀
+            </button>
+          </div>
         </div>
       )}
 
