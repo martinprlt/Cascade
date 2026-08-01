@@ -6,7 +6,7 @@ import type { DatosCascade, ResultadoSimulacion } from "../../../lib/types";
 
 export const dynamic = "force-dynamic";
 
-const TIMEOUT_MS = 3000;
+const TIMEOUT_MS = 4000;
 const MODELO_GROQ = "llama-3.3-70b-versatile";
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
@@ -48,8 +48,12 @@ function explicacionDeterministica(
   resultado: ResultadoSimulacion,
   duracionHoras: number
 ): string {
-  const escenario = datos.escenarios.find((e) => e.id === escenarioId);
-  if (!escenario) throw new Error(`Escenario inexistente: ${escenarioId}`);
+  const escenario = datos.escenarios.find((e) => e.id === escenarioId) ?? {
+    id: "custom",
+    nombre: resultado.escenarioNombre || "Escenario Personalizado",
+    descripcion: "Escenario dinámico generado en tiempo real",
+    mutaciones: [],
+  };
   const nombreDeNodo = (id: string) => datos.nodos.find((n) => n.id === id)?.nombre ?? id;
   return explicarResultado(
     escenario,
@@ -69,11 +73,15 @@ function construirPrompt(escenarioId: string, resultado: ResultadoSimulacion, du
   const bajaPresion = porSeveridad("baja_presion");
   const m = resultado.metricas;
   return [
-    `Escenario: ${escenarioId} (${resultado.escenarioNombre}).`,
+    `Escenario Simulado: ${escenarioId} (${resultado.escenarioNombre}).`,
     `Barrios sin servicio (${m.usuariosSinServicio} usuarios): ${sinServicio.join(", ") || "ninguno"}.`,
     `Barrios con baja presion (${m.usuariosBajaPresion} usuarios): ${bajaPresion.join(", ") || "ninguno"}.`,
-    `Duracion: ${duracionHoras} h. Deficit estimado: ${m.deficitM3} m3. Camiones requeridos: ${m.camionesRequeridos}. Costo de mitigacion: $ ${m.costoMitigacionARS.toLocaleString("es-AR")}.`,
-    "Explica en máximo 2 a 3 oraciones breves en español rioplatense, sin inventar datos: qué falló, barrios afectados y mitigación.",
+    `Horizonte Temporal: ${duracionHoras} h. Deficit estimado: ${m.deficitM3} m3. Camiones requeridos: ${m.camionesRequeridos}. Costo estimado: $ ${m.costoMitigacionARS.toLocaleString("es-AR")}.`,
+    "Instrucciones de Respuesta:",
+    "Provee una explicacion clara y una solucion operativa concreta en español rioplatense (3 a 4 oraciones maximo):",
+    "1. DIAGNÓSTICO: Explica la causa de la falla y qué elemento se descompuso o cerro.",
+    "2. AFECTACIÓN: Menciona el total de personas y barrios afectados.",
+    "3. SOLUCIÓN Y RECOMENDACIÓN: Provee una instruccion operativa precisa (ej: maniobrar valvulas de interconexion, desplegar flota de camiones cisterna o presurizar ramales).",
   ].join("\n");
 }
 
@@ -96,12 +104,12 @@ async function explicacionLLM(
       body: JSON.stringify({
         model: MODELO_GROQ,
         temperature: 0.2,
-        max_tokens: 200,
+        max_tokens: 280,
         messages: [
           {
             role: "system",
             content:
-              "Sos el explicador técnico de CASCADE (red de agua de La Rioja). Redacta en 2-3 oraciones directas sin preámbulos ni saludos. No inventes números ni barrios.",
+              "Sos el Asistente IA de Inteligencia Operativa de CASCADE (red de agua de La Rioja). Tu trabajo es dar diagnostico claro y recomendacion operativa de solucion. Redacta directo sin preambulos. No inventes numeros ni barrios.",
           },
           { role: "user", content: construirPrompt(escenarioId, resultado, duracionHoras) },
         ],
@@ -129,7 +137,8 @@ export async function POST(req: Request) {
     }
 
     const datos = cargarDatosCascade();
-    if (!datos.escenarios.some((e) => e.id === validado.escenarioId)) {
+    // Allow custom scenarios to pass through cleanly
+    if (validado.escenarioId !== "custom" && !datos.escenarios.some((e) => e.id === validado.escenarioId)) {
       return NextResponse.json({ error: `Escenario inexistente: ${validado.escenarioId}` }, { status: 404 });
     }
 
