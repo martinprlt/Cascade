@@ -1,0 +1,208 @@
+{
+  "meta": {
+    "proyecto": "CASCADE",
+    "casoDeEstudio": "Red de agua potable de Capital, La Rioja (Aguas Riojanas)",
+    "version": "1.0.0",
+    "nodos": 44,
+    "aristas": 48,
+    "nota": "Los valores con 'supuesto': true son parametrizables y se defienden ante el jurado (ver docs/02-modelo-red.md, seccion 6)."
+  },
+  "nodos": [
+    { "id": "acu-sanagasta", "nombre": "Acueducto Sanagasta", "tipo": "acueducto", "zona": "oeste", "estado": "activo", "caudalHorarioM3": 2200, "fuente": "F3: Nueva Rioja 17-18/12/2024", "descripcion": "Caudal nominal 2.200 m3/h; en crisis de dic-2024 paso a 830 m3/h (perdio mas de la mitad; dique Los Sauces en bajante historica)" },
+    { "id": "acu-zona-este", "nombre": "Acueducto Zona Este", "tipo": "acueducto", "zona": "este", "estado": "activo", "caudalHorarioM3": 150, "fuente": "F6: argentina.gob.ar 2022", "supuesto": true, "descripcion": "Obra 2022: 8.000 vecinos, ~2.500 lotes, ~6 km de canerias, valvulas de desague y de aire. Caudal supuesto" },
+    { "id": "perf-plaza-pesebre", "nombre": "Perforacion Plaza del Pesebre", "tipo": "perforacion", "zona": "oeste", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto (valor tipico de perforacion)" },
+    { "id": "perf-cochangasta", "nombre": "Perforacion Escuela de Cochangasta", "tipo": "perforacion", "zona": "oeste", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto" },
+    { "id": "perf-unlar", "nombre": "Perforacion UNLaR", "tipo": "perforacion", "zona": "oeste", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto" },
+    { "id": "perf-colegio-medico", "nombre": "Perforacion Colegio Medico", "tipo": "perforacion", "zona": "oeste", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto" },
+    { "id": "perf-b-municipal", "nombre": "Perforacion Barrio Municipal", "tipo": "perforacion", "zona": "oeste", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto" },
+    { "id": "perf-circunvalacion", "nombre": "Perforacion Circunvalacion (Cerro de la Cruz)", "tipo": "perforacion", "zona": "oeste", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto. Ubicacion por zona oeste: asignacion del equipo" },
+    { "id": "perf-parque-ciudad", "nombre": "Perforacion Parque de la Ciudad", "tipo": "perforacion", "zona": "oeste", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto" },
+    { "id": "perf-copegraf", "nombre": "Perforacion Copegraf (predio, Av. 30 de Septiembre Sur)", "tipo": "perforacion", "zona": "sur", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto" },
+    { "id": "perf-lawn-tenis", "nombre": "Perforacion Lawn Tenis", "tipo": "perforacion", "zona": "sur", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto" },
+    { "id": "perf-las-talas", "nombre": "Perforacion Las Talas", "tipo": "perforacion", "zona": "sur", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto. Nodo del escenario esc-04" },
+    { "id": "perf-parque-familia", "nombre": "Perforacion Parque de la Familia", "tipo": "perforacion", "zona": "sur", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Caudal supuesto" },
+    { "id": "perf-los-cactus", "nombre": "Perforacion Av. Los Cactus", "tipo": "perforacion", "zona": "sur", "estado": "activo", "caudalHorarioM3": 25, "fuente": "F1: El Destape 19/12/2024", "supuesto": true, "descripcion": "Nodo del evento de validacion de dic-2024 (esc-01)" },
+    { "id": "tanque-oeste", "nombre": "Tanque Zona Oeste", "tipo": "tanque", "zona": "oeste", "estado": "activo", "supuesto": true, "descripcion": "Infraestructura estandar de la red; existencia y ubicacion supuestas" },
+    { "id": "tanque-central", "nombre": "Tanque Central", "tipo": "tanque", "zona": "centro", "estado": "activo", "supuesto": true, "descripcion": "Infraestructura estandar de la red; supuesto" },
+    { "id": "bomba-sur", "nombre": "Bomba sector Sur", "tipo": "bomba", "zona": "sur", "estado": "activo", "supuesto": true, "descripcion": "Estacion elevadora del sector sur; supuesto" },
+    { "id": "valvula-sanagasta", "nombre": "Valvula de cabecera Sanagasta", "tipo": "valvula", "subTipo": "control", "zona": "oeste", "estado": "activo", "supuesto": true, "descripcion": "Valvula de control del acueducto; supuesto" },
+    { "id": "valvula-cactus", "nombre": "Valvula sector Av. Los Cactus", "tipo": "valvula", "subTipo": "sector", "zona": "sur", "estado": "activo", "supuesto": true, "descripcion": "Sectoriza el ramal dedicado de Los Cactus; supuesto" },
+    { "id": "valvula-este", "nombre": "Valvula sector Este", "tipo": "valvula", "subTipo": "sector", "zona": "este", "estado": "activo", "supuesto": true, "descripcion": "Corte del sector este; nodo de esc-03 y del ranking de esc-05" },
+    { "id": "valvula-rama-alta", "nombre": "Valvula ramal zona alta oeste", "tipo": "valvula", "subTipo": "sector", "zona": "oeste", "estado": "activo", "supuesto": true, "descripcion": "Ramal que alimenta los barrios altos del oeste solo desde el acueducto; se cierra en esc-02 (maniobra de presurizacion por turnos)" },
+    { "id": "dist-oeste", "nombre": "Distribuidor zona oeste", "tipo": "valvula", "subTipo": "distribuidor", "zona": "oeste", "estado": "activo", "supuesto": true, "descripcion": "Nodo de distribucion; supuesto" },
+    { "id": "dist-sur", "nombre": "Distribuidor zona sur", "tipo": "valvula", "subTipo": "distribuidor", "zona": "sur", "estado": "activo", "supuesto": true, "descripcion": "Nodo de distribucion que concentra las 5 fuentes del sur; supuesto" },
+    { "id": "dist-este", "nombre": "Distribuidor zona este", "tipo": "valvula", "subTipo": "distribuidor", "zona": "este", "estado": "activo", "supuesto": true, "descripcion": "Nodo de distribucion del acueducto zona este; supuesto" },
+    { "id": "valvula-inter-sur-oeste", "nombre": "Interconexion sur-oeste (emergencia)", "tipo": "valvula", "subTipo": "interconexion", "zona": "sur", "estado": "cerrada", "supuesto": true, "descripcion": "Cerrada por defecto. Apertura = maniobra de mitigacion en esc-05 (ranking)" },
+    { "id": "valvula-inter-sur-este", "nombre": "Interconexion sur-este (emergencia)", "tipo": "valvula", "subTipo": "interconexion", "zona": "sur", "estado": "cerrada", "supuesto": true, "descripcion": "Cerrada por defecto. Apertura = maniobra de mitigacion en esc-05 (ranking)" },
+    { "id": "barrio-procrear", "nombre": "Barrio Procrear", "tipo": "barrio", "zona": "sur", "estado": "activo", "usuarios": 1200, "m3Dia": 240, "supuesto": true, "estadoReportadoDic2024": "sin_servicio", "fuente": "F2: Nueva Rioja 17/12/2024", "descripcion": "Sin servicio en dic-2024; alimentado solo por el ramal Los Cactus" },
+    { "id": "barrio-nk-alta", "nombre": "Barrio Nestor Kirchner (parte alta)", "tipo": "barrio", "zona": "sur", "estado": "activo", "usuarios": 900, "m3Dia": 180, "supuesto": true, "estadoReportadoDic2024": "sin_servicio", "fuente": "F2: Nueva Rioja 17/12/2024", "descripcion": "Sin servicio en dic-2024; alimentado solo por el ramal Los Cactus" },
+    { "id": "barrio-las-talas-alta", "nombre": "Barrio Las Talas (parte alta)", "tipo": "barrio", "zona": "sur", "estado": "activo", "usuarios": 800, "m3Dia": 160, "supuesto": true, "estadoReportadoDic2024": "sin_servicio", "fuente": "F2: Nueva Rioja 17/12/2024", "descripcion": "Sin servicio en dic-2024; alimentado solo por el ramal Los Cactus" },
+    { "id": "barrio-luis-vernet", "nombre": "Barrio Luis Vernet", "tipo": "barrio", "zona": "sur", "estado": "activo", "usuarios": 950, "m3Dia": 190, "supuesto": true, "estadoReportadoDic2024": "baja_presion", "fuente": "F2: Nueva Rioja 17/12/2024", "descripcion": "Baja presion en dic-2024" },
+    { "id": "barrio-susana-quintela", "nombre": "Barrio Susana Quintela", "tipo": "barrio", "zona": "sur", "estado": "activo", "usuarios": 700, "m3Dia": 140, "supuesto": true, "estadoReportadoDic2024": "baja_presion", "fuente": "F2: Nueva Rioja 17/12/2024", "descripcion": "Baja presion en dic-2024" },
+    { "id": "barrio-el-mirador", "nombre": "Barrio El Mirador", "tipo": "barrio", "zona": "sur", "estado": "activo", "usuarios": 850, "m3Dia": 170, "supuesto": true, "estadoReportadoDic2024": "baja_presion", "fuente": "F2: Nueva Rioja 17/12/2024", "descripcion": "Baja presion en dic-2024" },
+    { "id": "barrio-rivadavia", "nombre": "Barrio Rivadavia", "tipo": "barrio", "zona": "sur", "estado": "activo", "usuarios": 1100, "m3Dia": 220, "supuesto": true, "estadoReportadoDic2024": "baja_presion", "fuente": "F2: Nueva Rioja 17/12/2024", "descripcion": "Baja presion en dic-2024" },
+    { "id": "barrio-circunvalacion", "nombre": "Barrio Circunvalacion", "tipo": "barrio", "zona": "sur", "estado": "activo", "usuarios": 1300, "m3Dia": 260, "supuesto": true, "estadoReportadoDic2024": "baja_presion", "fuente": "F2: Nueva Rioja 17/12/2024", "descripcion": "Baja presion en dic-2024" },
+    { "id": "barrio-nueva-esperanza", "nombre": "Barrio Nueva Esperanza", "tipo": "barrio", "zona": "sur", "estado": "activo", "usuarios": 1500, "m3Dia": 300, "supuesto": true, "estadoReportadoDic2024": "baja_presion", "fuente": "F2: Nueva Rioja 17/12/2024", "descripcion": "Baja presion en dic-2024" },
+    { "id": "barrio-coop-santa-rosa", "nombre": "Barrio Coop. Santa Rosa", "tipo": "barrio", "zona": "sur", "estado": "activo", "usuarios": 900, "m3Dia": 180, "supuesto": true, "estadoReportadoDic2024": "baja_presion", "fuente": "F2: Nueva Rioja 17/12/2024", "descripcion": "Baja presion en dic-2024" },
+    { "id": "barrio-emp-telecom", "nombre": "Barrio Emp. Telecom", "tipo": "barrio", "zona": "sur", "estado": "activo", "usuarios": 250, "m3Dia": 50, "supuesto": true, "estadoReportadoDic2024": "baja_presion", "fuente": "F2: Nueva Rioja 17/12/2024", "descripcion": "Baja presion en dic-2024" },
+    { "id": "barrio-san-cayetano", "nombre": "Barrio San Cayetano", "tipo": "barrio", "zona": "sur", "estado": "activo", "usuarios": 1050, "m3Dia": 210, "supuesto": true, "estadoReportadoDic2024": "baja_presion", "fuente": "F2: Nueva Rioja 17/12/2024", "descripcion": "Baja presion en dic-2024" },
+    { "id": "barrio-yacampis", "nombre": "Barrio Yacampis", "tipo": "barrio", "zona": "este", "estado": "activo", "usuarios": 1200, "m3Dia": 240, "supuesto": true, "fuente": "F6: argentina.gob.ar 2022", "descripcion": "Beneficiario del acueducto zona este; usuarios supuestos" },
+    { "id": "barrio-la-rodadera", "nombre": "Barrio La Rodadera", "tipo": "barrio", "zona": "este", "estado": "activo", "usuarios": 900, "m3Dia": 180, "supuesto": true, "fuente": "F6: argentina.gob.ar 2022", "descripcion": "Beneficiario del acueducto zona este; usuarios supuestos" },
+    { "id": "barrio-centro-comercial", "nombre": "Barrio Centro Comercial", "tipo": "barrio", "zona": "este", "estado": "activo", "usuarios": 400, "m3Dia": 80, "supuesto": true, "fuente": "F6: argentina.gob.ar 2022", "descripcion": "Beneficiario del acueducto zona este; usuarios supuestos" },
+    { "id": "barrio-centro", "nombre": "Barrio Centro", "tipo": "barrio", "zona": "centro", "estado": "activo", "usuarios": 3500, "m3Dia": 700, "supuesto": true, "descripcion": "Barrio representativo agregado por el equipo (no figura en el reporte del evento); usuarios supuestos" },
+    { "id": "barrio-san-nicolas", "nombre": "Barrio San Nicolas", "tipo": "barrio", "zona": "oeste", "estado": "activo", "usuarios": 1600, "m3Dia": 320, "supuesto": true, "descripcion": "Barrio representativo agregado por el equipo; zona alta oeste, alimentado solo por el acueducto (ramal alto); usuarios supuestos" },
+    { "id": "barrio-don-bosco", "nombre": "Barrio Don Bosco", "tipo": "barrio", "zona": "oeste", "estado": "activo", "usuarios": 1400, "m3Dia": 280, "supuesto": true, "descripcion": "Barrio representativo agregado por el equipo; zona alta oeste, alimentado solo por el acueducto (ramal alto); usuarios supuestos" }
+  ],
+  "aristas": [
+    { "from": "acu-sanagasta", "to": "valvula-sanagasta", "dirigida": true, "etiqueta": "caneria troncal", "estado": "abierta", "capacidad": 2200 },
+    { "from": "valvula-sanagasta", "to": "tanque-oeste", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "tanque-oeste", "to": "dist-oeste", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "perf-plaza-pesebre", "to": "dist-oeste", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "perf-cochangasta", "to": "dist-oeste", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "perf-unlar", "to": "dist-oeste", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "perf-colegio-medico", "to": "dist-oeste", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "perf-b-municipal", "to": "dist-oeste", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "perf-circunvalacion", "to": "dist-oeste", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "perf-parque-ciudad", "to": "dist-oeste", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "dist-oeste", "to": "barrio-centro", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "dist-oeste", "to": "tanque-central", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "dist-oeste", "to": "valvula-rama-alta", "dirigida": true, "etiqueta": "ramal zona alta", "estado": "abierta" },
+    { "from": "valvula-rama-alta", "to": "barrio-san-nicolas", "dirigida": true, "etiqueta": "ramal zona alta", "estado": "abierta" },
+    { "from": "valvula-rama-alta", "to": "barrio-don-bosco", "dirigida": true, "etiqueta": "ramal zona alta", "estado": "abierta" },
+    { "from": "tanque-central", "to": "valvula-este", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "valvula-este", "to": "acu-zona-este", "dirigida": true, "etiqueta": "alimentacion acueducto zona este", "estado": "abierta" },
+    { "from": "acu-zona-este", "to": "dist-este", "dirigida": true, "etiqueta": "acueducto zona este (2022)", "estado": "abierta" },
+    { "from": "dist-este", "to": "barrio-yacampis", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "dist-este", "to": "barrio-la-rodadera", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "dist-este", "to": "barrio-centro-comercial", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "perf-los-cactus", "to": "valvula-cactus", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "valvula-cactus", "to": "barrio-procrear", "dirigida": true, "etiqueta": "ramal dedicado Los Cactus", "estado": "abierta" },
+    { "from": "valvula-cactus", "to": "barrio-nk-alta", "dirigida": true, "etiqueta": "ramal dedicado Los Cactus", "estado": "abierta" },
+    { "from": "valvula-cactus", "to": "barrio-las-talas-alta", "dirigida": true, "etiqueta": "ramal dedicado Los Cactus", "estado": "abierta" },
+    { "from": "valvula-cactus", "to": "dist-sur", "dirigida": true, "etiqueta": "alimentacion distribuidor sur", "estado": "abierta" },
+    { "from": "perf-copegraf", "to": "dist-sur", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "perf-lawn-tenis", "to": "dist-sur", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "perf-las-talas", "to": "dist-sur", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "perf-parque-familia", "to": "dist-sur", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "dist-sur", "to": "bomba-sur", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "bomba-sur", "to": "barrio-luis-vernet", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "bomba-sur", "to": "barrio-susana-quintela", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "bomba-sur", "to": "barrio-el-mirador", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "bomba-sur", "to": "barrio-rivadavia", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "bomba-sur", "to": "barrio-circunvalacion", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "bomba-sur", "to": "barrio-nueva-esperanza", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "bomba-sur", "to": "barrio-coop-santa-rosa", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "bomba-sur", "to": "barrio-emp-telecom", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "bomba-sur", "to": "barrio-san-cayetano", "dirigida": true, "etiqueta": "caneria", "estado": "abierta" },
+    { "from": "dist-oeste", "to": "dist-sur", "dirigida": true, "etiqueta": "interconexion de emergencia (cerrada por defecto)", "estado": "cerrada", "viaValvula": "valvula-inter-sur-oeste" },
+    { "from": "dist-oeste", "to": "barrio-procrear", "dirigida": true, "etiqueta": "ramal de emergencia inter-sur-oeste (cerrado por defecto)", "estado": "cerrada", "viaValvula": "valvula-inter-sur-oeste" },
+    { "from": "dist-oeste", "to": "barrio-nk-alta", "dirigida": true, "etiqueta": "ramal de emergencia inter-sur-oeste (cerrado por defecto)", "estado": "cerrada", "viaValvula": "valvula-inter-sur-oeste" },
+    { "from": "dist-oeste", "to": "barrio-las-talas-alta", "dirigida": true, "etiqueta": "ramal de emergencia inter-sur-oeste (cerrado por defecto)", "estado": "cerrada", "viaValvula": "valvula-inter-sur-oeste" },
+    { "from": "tanque-central", "to": "dist-sur", "dirigida": true, "etiqueta": "interconexion de emergencia (cerrada por defecto)", "estado": "cerrada", "viaValvula": "valvula-inter-sur-este" },
+    { "from": "tanque-central", "to": "barrio-procrear", "dirigida": true, "etiqueta": "ramal de emergencia inter-sur-este (cerrado por defecto)", "estado": "cerrada", "viaValvula": "valvula-inter-sur-este" },
+    { "from": "tanque-central", "to": "barrio-nk-alta", "dirigida": true, "etiqueta": "ramal de emergencia inter-sur-este (cerrado por defecto)", "estado": "cerrada", "viaValvula": "valvula-inter-sur-este" },
+    { "from": "tanque-central", "to": "barrio-las-talas-alta", "dirigida": true, "etiqueta": "ramal de emergencia inter-sur-este (cerrado por defecto)", "estado": "cerrada", "viaValvula": "valvula-inter-sur-este" }
+  ],
+  "escenarios": [
+    {
+      "id": "esc-01",
+      "nombre": "Falla perforacion Av. Los Cactus",
+      "descripcion": "Escenario de VALIDACION contra el evento real del 17/12/2024 (F2): falla la perforacion Av. Los Cactus; 3 barrios del ramal dedicado pierden todas sus fuentes (sin servicio) y los 9 barrios alimentados por el distribuidor sur pierden una de cinco (baja presion). Reparacion estimada: ~48 hs.",
+      "mutaciones": [
+        { "nodo": "perf-los-cactus", "accion": "falla" }
+      ],
+      "eventoReal": {
+        "fuente": "F2: Nueva Rioja, 17/12/2024",
+        "reporte": "Procrear, Nestor Kirchner (parte alta) y Las Talas (parte alta) sin servicio; baja presion en Luis Vernet, Susana Quintela, El Mirador, Rivadavia, Circunvalacion, Nueva Esperanza, Coop. Santa Rosa, Emp. Telecom y San Cayetano. Compensacion con maniobras desde otros sectores y camiones aguateros; ~48 hs de reparacion."
+      },
+      "validacion": {
+        "estadoEsperado": {
+          "sin_servicio": ["barrio-procrear", "barrio-nk-alta", "barrio-las-talas-alta"],
+          "baja_presion": ["barrio-luis-vernet", "barrio-susana-quintela", "barrio-el-mirador", "barrio-rivadavia", "barrio-circunvalacion", "barrio-nueva-esperanza", "barrio-coop-santa-rosa", "barrio-emp-telecom", "barrio-san-cayetano"]
+        },
+        "duracionReportadaHoras": 48,
+        "metricasEsperadas": {
+          "usuariosSinServicio": 2900,
+          "usuariosBajaPresion": 8600,
+          "deficitM3": 2880,
+          "costoMitigacionARS": 60000000,
+          "camionesRequeridos": 15,
+          "camionesRealesDelEvento": 15,
+          "recallEsperado": 1.0
+        }
+      }
+    },
+    {
+      "id": "esc-02",
+      "nombre": "Falla parcial acueducto Sanagasta (2.200 -> 830 m3/h)",
+      "descripcion": "Crisis hidrica de dic-2024 (F1, F3, F4): el acueducto Sanagasta pierde mas de la mitad de su caudal; se corta el ramal de la zona alta del oeste (maniobra de presurizacion por turnos, de abajo hacia arriba). Barrios altos del oeste sin servicio; el Centro pierde la fuente acueducto y queda con baja presion. Agua por turnos en el resto de la zona oeste.",
+      "mutaciones": [
+        { "nodo": "acu-sanagasta", "accion": "reduccion", "caudalHorarioM3": 830 },
+        { "nodo": "valvula-rama-alta", "accion": "cierre" }
+      ]
+    },
+    {
+      "id": "esc-03",
+      "nombre": "Cierre valvula sector Este",
+      "descripcion": "Mantenimiento programado en el sector este: se cierra valvula-este y el acueducto zona este (Yacampis, La Rodadera, Centro Comercial) queda sin alimentacion.",
+      "mutaciones": [
+        { "nodo": "valvula-este", "accion": "cierre" }
+      ]
+    },
+    {
+      "id": "esc-04",
+      "nombre": "Falla perforacion Las Talas",
+      "descripcion": "Falla una perforacion de refuerzo de la zona sur: el distribuidor sur pasa de cinco fuentes a cuatro; los 9 barrios del sur pierden una fuente (baja presion). Ninguno pierde todas.",
+      "mutaciones": [
+        { "nodo": "perf-las-talas", "accion": "falla" }
+      ]
+    },
+    {
+      "id": "esc-05",
+      "nombre": "Combinado: Los Cactus + Las Talas + cierre sector Este",
+      "descripcion": "Escenario de ranking de alternativas: falla la perforacion de Los Cactus, falla la perforacion Las Talas y el sector este esta cerrado por mantenimiento. El ranking evalua K=5 maniobras (aperturas/reaperturas de valvulas + opcion sin maniobra) y ordena por costo de mitigacion total.",
+      "mutaciones": [
+        { "nodo": "perf-los-cactus", "accion": "falla" },
+        { "nodo": "perf-las-talas", "accion": "falla" },
+        { "nodo": "valvula-este", "accion": "cierre" }
+      ],
+      "ranking": {
+        "candidatos": [
+          { "id": "man-01", "nombre": "Sin maniobra", "mutaciones": [] },
+          { "id": "man-02", "nombre": "Abrir interconexion sur-oeste", "mutaciones": [{ "nodo": "valvula-inter-sur-oeste", "accion": "apertura" }] },
+          { "id": "man-03", "nombre": "Abrir interconexion sur-este", "mutaciones": [{ "nodo": "valvula-inter-sur-este", "accion": "apertura" }] },
+          { "id": "man-04", "nombre": "Reabrir valvula sector Este", "mutaciones": [{ "nodo": "valvula-este", "accion": "apertura" }] },
+          { "id": "man-05", "nombre": "Combinada: reabrir Este + abrir interconexion sur-oeste", "mutaciones": [{ "nodo": "valvula-este", "accion": "apertura" }, { "nodo": "valvula-inter-sur-oeste", "accion": "apertura" }] }
+        ],
+        "criterio": "ascendente por costoMitigacionARS; desempate por deficitM3 y luego severidadAgregada",
+        "resultadoEsperado": [
+          { "id": "man-05", "costoMitigacionARS": 48000000, "deficitM3": 2300, "camionesRequeridos": 12 },
+          { "id": "man-04", "costoMitigacionARS": 60000000, "deficitM3": 2880, "camionesRequeridos": 15 },
+          { "id": "man-02", "costoMitigacionARS": 68750000, "deficitM3": 3300, "camionesRequeridos": 18 },
+          { "id": "man-03", "costoMitigacionARS": 68750000, "deficitM3": 3300, "camionesRequeridos": 18 },
+          { "id": "man-01", "costoMitigacionARS": 81000000, "deficitM3": 3880, "camionesRequeridos": 21 }
+        ]
+      }
+    }
+  ],
+  "supuestos": {
+    "consumoLitrosPerCapitaDia": 200,
+    "costoViajeCamionAguateroARS": 250000,
+    "camionesIniciales": 7,
+    "camionesRefuerzo": 15,
+    "duracionFallaHoras": 48,
+    "capacidadCisternaM3": 12,
+    "viajesPorCamionDia": 8,
+    "factorSeveridadBajaPresion": 0.5,
+    "nota": "Todos los supuestos son parametrizables: se modifican aca y el motor re-simula sin tocar codigo. Los valores de camiones (7 -> 15) y capacidad de cisterna (12 m3 x 8 viajes/dia) estan calibrados para reproducir la flota real del evento de dic-2024 (F4)."
+  },
+  "fuentes": [
+    { "ref": "F1", "nombre": "El Destape - Perforaciones y distribucion estrategica de agua: las claves del plan de obras hidricas", "url": "https://www.eldestapeweb.com/informacion-general/crisis-hiidrica/perforaciones-y-distribucion-estrategica-de-agua-las-claves-del-plan-de-obras-hidricas-que-lleva-adelante-la-rioja-20241219124332", "fecha": "19/12/2024" },
+    { "ref": "F2", "nombre": "Nueva Rioja - Aguas Riojanas comunica problemas en la perforacion de Av. Los Cactus", "url": "https://nuevarioja.com.ar/sociedad/aguas-riojanas-comunica-problemas-en-la-perforacion-de-av-los-cactus-en-la-zona-sur.htm", "fecha": "17/12/2024" },
+    { "ref": "F3", "nombre": "Nueva Rioja - Obras esenciales para hacer frente a la grave situacion de la Capital por la escasez de agua", "url": "https://nuevarioja.com.ar/sociedad/obras-esenciales-para-hacer-frente-a-la-grave-situacion-de-la-capital-por-la-escasez-de-agua.htm", "fecha": "17-18/12/2024" },
+    { "ref": "F4", "nombre": "Riojalibre - Asistencia con camiones donde no hay presion y agua por turnos", "url": "https://riojalibre.com.ar/desde-aguas-riojanas-informaron-que-se-esta-brindando-asistencia-con-camiones-donde-no-hay-presion-y-se-brinda-agua-por-turnos/", "fecha": "dic 2024" },
+    { "ref": "F5", "nombre": "El Independiente - Infraestructura de Aguas Riojanas en Capital", "url": "https://www.elindependiente.com.ar/pagina.php?id=337176", "fecha": "2024" },
+    { "ref": "F6", "nombre": "argentina.gob.ar - Continuan los trabajos para ampliar la cobertura de agua potable en La Rioja", "url": "https://www.argentina.gob.ar/noticias/continuan-los-trabajos-para-ampliar-la-cobertura-de-agua-potable-en-la-rioja", "fecha": "2022" },
+    { "ref": "F7", "nombre": "Aguas Riojanas - Sitio oficial (empresa estatal, Ley Provincial 8707/2010)", "url": "https://www.aguasriojanas.com.ar/oficial/index.php", "fecha": "—" }
+  ]
+}
