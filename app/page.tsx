@@ -104,6 +104,7 @@ export default function Home() {
   const [seleccionado, setSeleccionado] = useState<string>("esc-01");
   const [esCustom, setEsCustom] = useState<boolean>(false);
   const [nombreCustomActual, setNombreCustomActual] = useState<string>("");
+  const [duracionHoras, setDuracionHoras] = useState<number>(48);
 
   const [resultado, setResultado] = useState<ResultadoSimulacion | null>(null);
   const [ranking, setRanking] = useState<RespuestaRanking | null>(null);
@@ -114,7 +115,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [tabActiva, setTabActiva] = useState<"mapa" | "escenarios" | "validacion">("mapa");
 
-  const simular = useCallback(async (escenarioId: string) => {
+  const simular = useCallback(async (escenarioId: string, horas = duracionHoras) => {
     setCargando(true);
     setError(null);
     setSeleccionado(escenarioId);
@@ -124,7 +125,7 @@ export default function Home() {
       const resSimular = await fetch("/api/simular", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ escenarioId }),
+        body: JSON.stringify({ escenarioId, duracionHoras: horas }),
       });
       if (!resSimular.ok) throw new Error(`Error al simular: HTTP ${resSimular.status}`);
       const r = (await resSimular.json()) as ResultadoSimulacion;
@@ -134,7 +135,7 @@ export default function Home() {
       const resRanking = await fetch("/api/ranking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ escenarioId }),
+        body: JSON.stringify({ escenarioId, duracionHoras: horas }),
       });
       if (resRanking.ok) setRanking((await resRanking.json()) as RespuestaRanking);
 
@@ -161,9 +162,9 @@ export default function Home() {
     } finally {
       setCargando(false);
     }
-  }, []);
+  }, [duracionHoras]);
 
-  const simularCustom = useCallback(async (mutaciones: Mutacion[], nombreCustom: string) => {
+  const simularCustom = useCallback(async (mutaciones: Mutacion[], nombreCustom: string, horas = duracionHoras) => {
     setCargando(true);
     setError(null);
     setEsCustom(true);
@@ -173,7 +174,7 @@ export default function Home() {
       const resSimular = await fetch("/api/simular", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mutaciones, nombreCustom }),
+        body: JSON.stringify({ mutaciones, nombreCustom, duracionHoras: horas }),
       });
       if (!resSimular.ok) throw new Error(`Error al simular personalizado: HTTP ${resSimular.status}`);
       const r = (await resSimular.json()) as ResultadoSimulacion;
@@ -203,7 +204,7 @@ export default function Home() {
     } finally {
       setCargando(false);
     }
-  }, []);
+  }, [duracionHoras]);
 
   useEffect(() => {
     let activo = true;
@@ -225,7 +226,7 @@ export default function Home() {
         if (activo) setError("No se pudo cargar la red o la validación");
       }
     })();
-    void simular("esc-01");
+    void simular("esc-01", 48);
     return () => {
       activo = false;
     };
@@ -236,6 +237,30 @@ export default function Home() {
     const baja = Object.values(resultado?.severidadPorBarrio ?? {}).filter((s) => s === "baja_presion").length;
     const totalBarrios = nodos.filter((n) => n.tipo === "barrio").length;
     return { sin, baja, normal: Math.max(totalBarrios - sin - baja, 0) };
+  }, [resultado, nodos]);
+
+  // Population distribution bar calculations
+  const distribucionPoblacion = useMemo(() => {
+    if (!resultado || nodos.length === 0) return { pctNormal: 100, pctBaja: 0, pctSin: 0 };
+    let usuariosNormal = 0;
+    let usuariosBaja = 0;
+    let usuariosSin = 0;
+
+    nodos.forEach((n) => {
+      if (n.tipo === "barrio" && n.usuarios) {
+        const sev = resultado.severidadPorBarrio[n.id];
+        if (sev === "sin_servicio") usuariosSin += n.usuarios;
+        else if (sev === "baja_presion") usuariosBaja += n.usuarios;
+        else usuariosNormal += n.usuarios;
+      }
+    });
+
+    const total = usuariosNormal + usuariosBaja + usuariosSin || 1;
+    return {
+      pctNormal: Number(((usuariosNormal / total) * 100).toFixed(1)),
+      pctBaja: Number(((usuariosBaja / total) * 100).toFixed(1)),
+      pctSin: Number(((usuariosSin / total) * 100).toFixed(1)),
+    };
   }, [resultado, nodos]);
 
   const filasValidacion = useMemo(() => {
@@ -249,6 +274,57 @@ export default function Home() {
     const ids = Array.from(new Set([...Object.keys(pred), ...Object.keys(real)]));
     return ids.map((id) => ({ id, pred: pred[id] ?? null, real: real[id] ?? null }));
   }, [validacion]);
+
+  const exportarInformeOficial = () => {
+    if (!resultado) return;
+    const fecha = new Date().toLocaleString("es-AR");
+    const contenido = `====================================================================
+CASCADE WATER SIM - INFORME OFICIAL DE CRISIS HÍDRICA
+GOBIERNO DE LA RIOJA | AGUAS RIOJANAS | DEFENSA CIVIL
+====================================================================
+Fecha de emisión: ${fecha}
+Escenario simulado: ${resultado.escenarioNombre} (${esCustom ? "PERSONALIZADO EN VIVO" : seleccionado})
+Ventana Temporal de Crisis: ${duracionHoras} Horas
+Tiempo de Cómputo del Motor: ${resultado.duracionMs} ms
+
+--------------------------------------------------------------------
+1. MÉTRICAS EJECUTIVAS DE IMPACTO
+--------------------------------------------------------------------
+- Usuarios Sin Servicio: ${formatoNumero(resultado.metricas.usuariosSinServicio)} personas
+- Usuarios con Baja Presión: ${formatoNumero(resultado.metricas.usuariosBajaPresion)} personas
+- Déficit Volumétrico Acumulado (${duracionHoras}h): ${formatoNumero(resultado.metricas.deficitM3)} m³
+- Camiones Cisterna Requeridos: ${formatoNumero(resultado.metricas.camionesRequeridos)} unidades
+- Viajes Totales de Camiones: ${formatoNumero(resultado.metricas.viajesCamion)} viajes
+- Costo Estimado de Mitigación: $${formatoNumero(resultado.metricas.costoMitigacionARS)} ARS
+
+--------------------------------------------------------------------
+2. PROTOCOLO Y EXPLICACIÓN TÉCNICA
+--------------------------------------------------------------------
+${textoExplicacion}
+
+--------------------------------------------------------------------
+3. MANIOBRA DE MITIGACIÓN RECOMENDADA
+--------------------------------------------------------------------
+${
+  mejorManiobra
+    ? `Acción: ${mejorManiobra.nombre}
+Costo de Mitigación: $${formatoNumero(mejorManiobra.metricas.costoMitigacionARS)} ARS
+Déficit Reducido a: ${formatoNumero(mejorManiobra.metricas.deficitM3)} m³`
+    : "Sin maniobras adicionales requeridas."
+}
+
+====================================================================
+Fin del informe. Generado por CASCADE WATER SIM v2.0
+====================================================================`;
+
+    const blob = new Blob([contenido], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `INFORME_CRISIS_CASCADE_${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const mejorManiobra = ranking?.resultados?.[0] ?? null;
   const m = resultado?.metricas;
@@ -318,6 +394,56 @@ export default function Home() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          {/* Time Horizon Selector Buttons */}
+          <div style={{ display: "flex", alignItems: "center", backgroundColor: "#161C22", border: "1px solid #334155", borderRadius: 4, padding: 2 }}>
+            <span style={{ fontSize: 10, fontWeight: "bold", color: "#bccabc", margin: "0 6px" }}>VENTANA:</span>
+            {[12, 24, 48, 72].map((h) => (
+              <button
+                key={h}
+                onClick={() => {
+                  setDuracionHoras(h);
+                  if (esCustom) {
+                    // re-simular custom con nuevas horas
+                  } else {
+                    void simular(seleccionado, h);
+                  }
+                }}
+                style={{
+                  backgroundColor: duracionHoras === h ? COLOR_PRIMARY : "transparent",
+                  color: duracionHoras === h ? "#00391d" : "#E2E8F0",
+                  border: "none",
+                  padding: "4px 8px",
+                  fontSize: 10,
+                  fontWeight: "bold",
+                  borderRadius: 2,
+                  cursor: "pointer",
+                }}
+              >
+                {h}H
+              </button>
+            ))}
+          </div>
+
+          {/* Export Report Button */}
+          <button
+            onClick={exportarInformeOficial}
+            style={{
+              backgroundColor: "rgba(81, 223, 142, 0.15)",
+              border: `1px solid ${COLOR_PRIMARY}`,
+              color: COLOR_PRIMARY,
+              padding: "6px 12px",
+              fontSize: 11,
+              fontWeight: 800,
+              borderRadius: 4,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            📥 INFORME OFICIAL
+          </button>
+
           <div
             style={{
               backgroundColor: "rgba(81, 223, 142, 0.1)",
@@ -332,12 +458,6 @@ export default function Home() {
           >
             {resultado ? `${resultado.duracionMs.toFixed(1)}ms LATENCY` : "0.2ms LATENCY"}
           </div>
-          <span className="material-symbols-outlined" style={{ color: "#bccabc", fontSize: 20 }}>
-            timer
-          </span>
-          <span className="material-symbols-outlined" style={{ color: "#bccabc", fontSize: 20 }}>
-            account_circle
-          </span>
         </div>
       </header>
 
@@ -489,30 +609,47 @@ export default function Home() {
                 backgroundColor: "rgba(26, 32, 38, 0.9)",
                 borderBottom: `1px solid ${COLOR_BORDER}`,
                 display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                flexDirection: "column",
+                gap: 8,
                 zIndex: 20,
               }}
             >
-              <h2 style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", display: "flex", alignItems: "center", gap: 6, color: "#E2E8F0" }}>
-                <span className="material-symbols-outlined" style={{ fontSize: 16, color: COLOR_PRIMARY }}>
-                  map
-                </span>
-                TOPOLOGÍA GIS LA RIOJA | HACE CLIC EN CUALQUIER NODO PARA SIMULAR SU FALLA
-              </h2>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <h2 style={{ margin: 0, fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", display: "flex", alignItems: "center", gap: 6, color: "#E2E8F0" }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 16, color: COLOR_PRIMARY }}>
+                    map
+                  </span>
+                  TOPOLOGÍA GIS LA RIOJA | HACE CLIC EN CUALQUIER NODO PARA SIMULAR SU FALLA
+                </h2>
 
-              <div style={{ display: "flex", gap: 14, fontSize: 10, fontWeight: "bold" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: COLOR_NORMAL }}></span>
-                  <span>Normal ({conteos.normal})</span>
+                <div style={{ display: "flex", gap: 14, fontSize: 10, fontWeight: "bold" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                    <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: COLOR_NORMAL }}></span>
+                    <span>Normal ({conteos.normal})</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                    <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: COLOR_WARNING }}></span>
+                    <span>Baja Presión ({conteos.baja})</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                    <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: COLOR_CRITICAL }}></span>
+                    <span>Sin Servicio ({conteos.sin})</span>
+                  </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: COLOR_WARNING }}></span>
-                  <span>Baja Presión ({conteos.baja})</span>
+              </div>
+
+              {/* Population Distribution Segmented Progress Bar */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, fontWeight: 800, color: "#bccabc" }}>
+                  <span>DISTRIBUCIÓN DE IMPACTO EN POBLACIÓN:</span>
+                  <span>
+                    {distribucionPoblacion.pctNormal}% NORMAL | {distribucionPoblacion.pctBaja}% BAJA PRESIÓN | {distribucionPoblacion.pctSin}% SIN SERVICIO
+                  </span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <span style={{ width: 7, height: 7, borderRadius: "50%", backgroundColor: COLOR_CRITICAL }}></span>
-                  <span>Sin Servicio ({conteos.sin})</span>
+                <div style={{ height: 6, width: "100%", backgroundColor: "#1E293B", borderRadius: 3, overflow: "hidden", display: "flex" }}>
+                  <div style={{ width: `${distribucionPoblacion.pctNormal}%`, backgroundColor: COLOR_NORMAL, transition: "width 0.3s ease" }}></div>
+                  <div style={{ width: `${distribucionPoblacion.pctBaja}%`, backgroundColor: COLOR_WARNING, transition: "width 0.3s ease" }}></div>
+                  <div style={{ width: `${distribucionPoblacion.pctSin}%`, backgroundColor: COLOR_CRITICAL, transition: "width 0.3s ease" }}></div>
                 </div>
               </div>
             </div>
@@ -576,7 +713,7 @@ export default function Home() {
                 sub="usuarios"
               />
               <TarjetaMetrica
-                label="Déficit 48h"
+                label={`Déficit (${duracionHoras}h)`}
                 valor={m ? formatoNumero(m.deficitM3) : "—"}
                 sufijo="m³"
               />
@@ -709,7 +846,7 @@ export default function Home() {
           {ranking?.resultados && ranking.resultados.length > 0 ? (
             <div style={{ backgroundColor: COLOR_CARD, border: `1px solid ${COLOR_BORDER}`, borderRadius: 4, padding: 20 }}>
               <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "#E2E8F0", letterSpacing: "0.05em" }}>
-                RANKING DE MANIOBRAS RECOMENDADAS DE MITIGACIÓN ({seleccionado.toUpperCase()})
+                RANKING DE MANIOBRAS RECOMENDADAS DE MITIGACIÓN ({seleccionado.toUpperCase()} - {duracionHoras}H)
               </h3>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, textAlign: "left" }}>
                 <thead>
