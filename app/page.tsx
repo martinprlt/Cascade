@@ -560,7 +560,7 @@ export default function Home() {
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <span style={{ fontSize: 10, fontWeight: "bold", opacity: 0.6 }}>RECALL:</span>
                   <span style={{ color: COLOR_PRIMARY, fontWeight: 900, fontSize: 14 }}>
-                    {validacion ? `RECALL ${validacion.esperado.sin_servicio.length + validacion.esperado.baja_presion.length}/${validacion.esperado.sin_servicio.length + validacion.esperado.baja_presion.length} (1.0)` : "—"}
+                    {validacion ? `RECALL ${filasValidacion.filter(f => f.pred === f.real).length}/${filasValidacion.length} (${validacion.recallPromedio.toFixed(1)})` : "—"}
                   </span>
                 </div>
               </div>
