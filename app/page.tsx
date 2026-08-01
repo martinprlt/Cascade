@@ -369,11 +369,24 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
             {menuIzquierdoAbierto ? "◀ OCULTAR PANEL" : "▶ VER ESCENARIOS"}
           </button>
 
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: 17, fontWeight: 900, color: COLOR_PRIMARY, letterSpacing: "-0.03em", lineHeight: 1 }}>
-              CASCADE WATER SIM
-            </span>
-            <span style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>La Rioja Capital | Twin Digital</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <img
+              src="/CASCADE.png"
+              alt="CASCADE Logo"
+              style={{
+                height: 32,
+                width: "auto",
+                objectFit: "contain",
+                borderRadius: 4,
+                filter: "drop-shadow(0 2px 8px rgba(81, 223, 142, 0.35))",
+              }}
+            />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ fontSize: 16, fontWeight: 900, color: COLOR_PRIMARY, letterSpacing: "-0.03em", lineHeight: 1 }}>
+                CASCADE WATER SIM
+              </span>
+              <span style={{ fontSize: 9, color: "#64748B", fontWeight: 700 }}>La Rioja Capital | Twin Digital</span>
+            </div>
           </div>
           
           <nav style={{ display: "flex", gap: 12, fontSize: 12, fontWeight: "bold", marginLeft: 8 }}>
