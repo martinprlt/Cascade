@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node -e \"process.stdin.resume(); import('./node_modules/next/dist/bin/next')\" dev",
+    "dev": "node -e \"process.stdin.resume(); import('./node_modules/next/dist/bin/next')\" dev -H 0.0.0.0 -p 3000",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -H 0.0.0.0 -p 3000",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
