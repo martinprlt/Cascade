@@ -327,6 +327,10 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
   };
 
   const mejorManiobra = ranking?.resultados?.[0] ?? null;
+  const sinManiobra = ranking?.resultados?.find((m) => m.maniobraId === "man-01") ?? null;
+  const ahorro = mejorManiobra && sinManiobra && sinManiobra.metricas.costoMitigacionARS > mejorManiobra.metricas.costoMitigacionARS
+    ? sinManiobra.metricas.costoMitigacionARS - mejorManiobra.metricas.costoMitigacionARS : null;
+  const ahorroPct = ahorro && sinManiobra ? Math.round((ahorro / sinManiobra.metricas.costoMitigacionARS) * 100) : null;
   const m = resultado?.metricas;
   const textoExplicacion = explicacion?.texto ?? resultado?.explicacion ?? "Seleccioná un escenario para generar la explicación.";
 
@@ -347,9 +351,14 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-          <span style={{ fontSize: 20, fontWeight: 900, color: COLOR_PRIMARY, letterSpacing: "-0.03em" }}>
-            CASCADE WATER SIM
-          </span>
+          <div>
+            <span style={{ fontSize: 20, fontWeight: 900, color: COLOR_PRIMARY, letterSpacing: "-0.03em" }}>
+              CASCADE WATER SIM
+            </span>
+            <div style={{ fontSize: 9, color: "#bccabc", letterSpacing: "0.03em", marginTop: 1 }}>
+              Caso de estudio: Red de distribución de agua de La Rioja Capital
+            </div>
+          </div>
           <nav style={{ display: "flex", gap: 16, fontSize: 13, fontWeight: "bold" }}>
             <button
               onClick={() => setTabActiva("mapa")}
@@ -573,13 +582,33 @@ Fin del informe. Generado por CASCADE WATER SIM v2.0
                   <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.08em", marginBottom: 2, opacity: 0.85 }}>
                     MANIOBRA RECOMENDADA
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 900, textTransform: "uppercase", lineHeight: 1.2 }}>
-                    {mejorManiobra.nombre}
-                  </div>
-                  <div style={{ marginTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 10, fontWeight: "bold", opacity: 0.9 }}>
-                      CONFIDENCIA: 98.4%
-                    </span>
+                   <div style={{ fontSize: 14, fontWeight: 900, textTransform: "uppercase", lineHeight: 1.2 }}>
+                     {mejorManiobra.nombre}
+                   </div>
+                   {sinManiobra && ahorro && ahorroPct ? (
+                     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                       <div>
+                         <div style={{ fontSize: 9, opacity: 0.7, marginBottom: 2, display: "flex", justifyContent: "space-between" }}>
+                           <span>SIN MANIOBRA</span><span>$ {formatoNumero(sinManiobra.metricas.costoMitigacionARS)}</span>
+                         </div>
+                         <div style={{ width: "100%", height: 4, backgroundColor: "rgba(0,57,29,0.3)", borderRadius: 2 }} />
+                       </div>
+                       <div>
+                         <div style={{ fontSize: 9, opacity: 0.7, marginBottom: 2, display: "flex", justifyContent: "space-between" }}>
+                           <span>MEJOR ALTERNATIVA</span><span>$ {formatoNumero(mejorManiobra.metricas.costoMitigacionARS)}</span>
+                         </div>
+                         <div style={{ position: "relative" }}>
+                           <div style={{ width: `${Math.round((mejorManiobra.metricas.costoMitigacionARS / sinManiobra.metricas.costoMitigacionARS) * 100)}%`, height: 4, backgroundColor: "#00391d", borderRadius: 2 }} />
+                           <span style={{ position: "absolute", left: `${Math.round((mejorManiobra.metricas.costoMitigacionARS / sinManiobra.metricas.costoMitigacionARS) * 100) + 2}%`, top: -2, fontSize: 10, fontWeight: 900, color: "#00391d", whiteSpace: "nowrap" }}>↓{ahorroPct}%</span>
+                         </div>
+                       </div>
+                     </div>
+                   ) : (
+                     <div style={{ fontSize: 12, fontWeight: 700, margin: "2px 0" }}>
+                       Costo: $ {formatoNumero(mejorManiobra.metricas.costoMitigacionARS)}
+                     </div>
+                   )}
+                   <div style={{ marginTop: 10, display: "flex", justifyContent: "flex-end" }}>
                     <button
                       onClick={() => void simular("esc-05")}
                       style={{
