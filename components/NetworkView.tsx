@@ -172,7 +172,6 @@ export default function NetworkView({
   etiquetas = true,
   onSimularCustom,
 }: NetworkViewProps) {
-  // Default Initial Pan & Zoom so the ENTIRE network fits on screen when loaded!
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState<number>(0.72);
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -240,6 +239,87 @@ export default function NetworkView({
   };
 
   const renderSimboloNodo = (n: Nodo, fill: string, contorno: string, x: number, y: number): JSX.Element => {
+    // TONY STARK HOLOGRAPHIC 3D EXTRUDED STRUCTURES MODE
+    if (is3D) {
+      const h3D = n.tipo === "barrio" ? 36 : n.tipo === "tanque" ? 44 : n.tipo === "acueducto" ? 24 : 30;
+      const xRoof = x;
+      const yRoof = y - h3D;
+
+      return (
+        <g>
+          {/* Subsurface Drop Shaft Conduit descending underground */}
+          <line x1={x} y1={y} x2={x} y2={y + 40} stroke="#38BDF8" strokeWidth="2" strokeDasharray="3 3" opacity={0.8} />
+          <circle cx={x} cy={y + 40} r="4" fill="#38BDF8" opacity={0.9} />
+
+          {/* 3D Ground Hologram Base Grid */}
+          <ellipse cx={x} cy={y + 6} rx={18} ry={9} fill="rgba(81, 223, 142, 0.15)" stroke={fill} strokeWidth="1" strokeDasharray="3 2" />
+
+          {/* 3D Vertical Extrusion Pillars */}
+          <line x1={x - 14} y1={y} x2={x - 14} y2={yRoof} stroke={fill} strokeWidth="1.5" opacity={0.8} />
+          <line x1={x + 14} y1={y} x2={x + 14} y2={yRoof} stroke={fill} strokeWidth="1.5" opacity={0.8} />
+          <line x1={x} y1={y + 5} x2={x} y2={yRoof + 5} stroke={fill} strokeWidth="1.5" opacity={0.9} />
+
+          {/* Translucent Glass Wall Facades */}
+          <polygon points={`${x - 14},${y} ${x},${y + 5} ${x},${yRoof + 5} ${x - 14},${yRoof}`} fill={fill} opacity={0.25} />
+          <polygon points={`${x},${y + 5} ${x + 14},${y} ${x + 14},${yRoof} ${x},${yRoof + 5}`} fill={fill} opacity={0.35} />
+
+          {/* 3D Elevated Holographic Roof Cap */}
+          {n.tipo === "barrio" && (
+            <g transform={`translate(${xRoof - 14}, ${yRoof - 14})`}>
+              <polygon points="14,0 28,10 14,20 0,10" fill={fill} stroke={contorno} strokeWidth="2" opacity={0.95} />
+              <path d="M 14 4 L 7 10 L 9 10 L 9 16 L 19 16 L 19 10 L 21 10 Z" fill="#FFFFFF" />
+            </g>
+          )}
+
+          {n.tipo === "perforacion" && (
+            <g transform={`translate(${xRoof - 12}, ${yRoof - 12})`}>
+              <polygon points="12,0 24,8 12,16 0,8" fill={fill} stroke={contorno} strokeWidth="2" />
+              <path d="M 12 3 C 9 7, 7 10, 7 13 A 5 5 0 0 0 17 13 C 17 10, 15 7, 12 3 Z" fill="#FFFFFF" />
+              {/* Deep Drilling Shaft animation */}
+              <line x1="12" y1="16" x2="12" y2="76" stroke="#38BDF8" strokeWidth="2.5" strokeDasharray="4 2">
+                <animate attributeName="stroke-dashoffset" values="0;-12" dur="0.8s" repeatCount="indefinite" />
+              </line>
+            </g>
+          )}
+
+          {n.tipo === "tanque" && (
+            <g transform={`translate(${xRoof - 14}, ${yRoof - 14})`}>
+              <ellipse cx="14" cy="8" rx="14" ry="7" fill={fill} stroke={contorno} strokeWidth="2" />
+              <rect x="0" y="8" width="28" height="12" fill={fill} opacity={0.6} />
+              <ellipse cx="14" cy="20" rx="14" ry="7" fill={fill} stroke={contorno} strokeWidth="1.5" />
+              <line x1="14" y1="1" x2="14" y2="27" stroke="#FFFFFF" strokeWidth="2" />
+            </g>
+          )}
+
+          {n.tipo === "bomba" && (
+            <g transform={`translate(${xRoof - 13}, ${yRoof - 13})`}>
+              <circle cx="13" cy="13" r="13" fill={fill} stroke={contorno} strokeWidth="2" />
+              <circle cx="13" cy="13" r="6" fill="#FFFFFF" />
+              {/* Spinning turbine ring animation */}
+              <circle cx="13" cy="13" r="10" fill="none" stroke="#FFFFFF" strokeWidth="1.5" strokeDasharray="6 4">
+                <animateTransform attributeName="transform" type="rotate" from="0 13 13" to="360 13 13" dur="2s" repeatCount="indefinite" />
+              </circle>
+            </g>
+          )}
+
+          {n.tipo === "acueducto" && (
+            <g transform={`translate(${xRoof - 15}, ${yRoof - 15})`}>
+              <polygon points="15,0 30,10 15,20 0,10" fill={fill} stroke={contorno} strokeWidth="2" />
+              <path d="M 7 10 L 23 10 M 18 5 L 23 10 L 18 15" stroke="#FFFFFF" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+            </g>
+          )}
+
+          {n.tipo === "valvula" && (
+            <g transform={`translate(${xRoof - 13}, ${yRoof - 13})`}>
+              <polygon points="13,0 26,13 13,26 0,13" fill={fill} stroke={contorno} strokeWidth="2" />
+              <circle cx="13" cy="13" r="4" fill="#FFFFFF" />
+            </g>
+          )}
+        </g>
+      );
+    }
+
+    // 2D FLAT MODE
     switch (n.tipo) {
       case "barrio":
         return (
@@ -326,11 +406,11 @@ export default function NetworkView({
         <div
           style={{
             background: "rgba(14,20,26,0.95)",
-            border: "1px solid #3d4a3f",
+            border: `1px solid ${is3D ? "#00f0ff" : "#3d4a3f"}`,
             padding: "4px 10px",
             fontSize: 10,
             fontFamily: "monospace",
-            color: "#51df8e",
+            color: is3D ? "#00f0ff" : "#51df8e",
             borderRadius: 2,
             display: "flex",
             alignItems: "center",
@@ -338,8 +418,8 @@ export default function NetworkView({
             boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
           }}
         >
-          <span style={{ width: 7, height: 7, backgroundColor: "#51df8e", borderRadius: "50%", display: "inline-block" }}></span>
-          SYSTEM: LA_RIOJA_AMP_MAP (1600x1000 Canvas)
+          <span style={{ width: 7, height: 7, backgroundColor: is3D ? "#00f0ff" : "#51df8e", borderRadius: "50%", display: "inline-block" }}></span>
+          {is3D ? "J.A.R.V.I.S. 3D HOLOGRAM MODE (EXTRUDED BUILDINGS & UNDERGROUND PIPES)" : "SYSTEM: LA_RIOJA_AMP_MAP (1600x1000 Canvas)"}
         </div>
 
         {/* Node Type & Pipeline Legend */}
@@ -374,7 +454,7 @@ export default function NetworkView({
           <div style={{ borderTop: "1px solid #1E293B", paddingTop: 4, display: "flex", gap: 12, fontSize: 9, color: "#bccabc" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <span style={{ width: 14, height: 2.5, backgroundColor: "#12B76A", display: "inline-block" }}></span>
-              <span>Tubería Activa (Con flujo)</span>
+              <span>{is3D ? "Tubería Subterránea Activa" : "Tubería Activa (Con flujo)"}</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <span style={{ width: 14, height: 0, borderTop: "2px dashed #475569", display: "inline-block" }}></span>
@@ -398,17 +478,19 @@ export default function NetworkView({
         <button
           onClick={() => setIs3D(!is3D)}
           style={{
-            backgroundColor: is3D ? "#51df8e" : "#1a2026",
-            color: is3D ? "#00391d" : "#51df8e",
-            border: "1px solid #51df8e",
-            padding: "4px 10px",
+            backgroundColor: is3D ? "#00f0ff" : "#1a2026",
+            color: is3D ? "#002b36" : "#51df8e",
+            border: `1px solid ${is3D ? "#00f0ff" : "#51df8e"}`,
+            padding: "4px 12px",
             fontSize: 11,
-            fontWeight: "bold",
+            fontWeight: 900,
             borderRadius: 2,
             cursor: "pointer",
+            boxShadow: is3D ? "0 0 16px rgba(0,240,255,0.6)" : "none",
+            transition: "all 0.2s ease",
           }}
         >
-          {is3D ? "MODO 3D (ON)" : "VISTA 3D"}
+          {is3D ? "⚡ HOLOGRAMA 3D (ON)" : "🕶️ MODO 3D STARK"}
         </button>
 
         <button
@@ -589,9 +671,9 @@ export default function NetworkView({
       >
         <div
           style={{
-            transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) ${is3D ? "rotateX(48deg) rotateZ(-12deg)" : ""}`,
+            transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) ${is3D ? "rotateX(54deg) rotateZ(-16deg)" : ""}`,
             transformOrigin: "center center",
-            transition: isDragging ? "none" : "transform 0.15s ease-out",
+            transition: isDragging ? "none" : "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
             width: ANCHO,
             height: ALTO,
           }}
@@ -601,22 +683,35 @@ export default function NetworkView({
               <marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="#12B76A" />
               </marker>
+              <marker id="flecha-sub" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#00f0ff" />
+              </marker>
             </defs>
 
             {/* Base Background */}
             <rect width={ANCHO} height={ALTO} fill="#0B1220" />
 
+            {/* TONY STARK HOLOGRAPHIC SCANNING GRID IN 3D MODE */}
+            {is3D && (
+              <g opacity="0.3">
+                <pattern id="stark-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00f0ff" strokeWidth="0.5" strokeDasharray="2 2" />
+                </pattern>
+                <rect width={ANCHO} height={ALTO} fill="url(#stark-grid)" />
+              </g>
+            )}
+
             {/* Expanded Urban Street Network Lines (1600x1000) */}
-            <g stroke="#1E293B" strokeWidth="1" opacity="0.6">
-              <line x1={0} y1={200} x2={ANCHO} y2={200} stroke="#334155" strokeWidth={14} />
-              <line x1={0} y1={460} x2={ANCHO} y2={460} stroke="#334155" strokeWidth={14} />
-              <line x1={0} y1={720} x2={ANCHO} y2={720} stroke="#334155" strokeWidth={16} />
-              <line x1={350} y1={0} x2={350} y2={ALTO} stroke="#334155" strokeWidth={12} />
-              <line x1={900} y1={0} x2={900} y2={ALTO} stroke="#334155" strokeWidth={14} />
+            <g stroke={is3D ? "#00f0ff" : "#1E293B"} strokeWidth="1" opacity={is3D ? 0.35 : 0.6}>
+              <line x1={0} y1={200} x2={ANCHO} y2={200} stroke={is3D ? "#003947" : "#334155"} strokeWidth={14} />
+              <line x1={0} y1={460} x2={ANCHO} y2={460} stroke={is3D ? "#003947" : "#334155"} strokeWidth={14} />
+              <line x1={0} y1={720} x2={ANCHO} y2={720} stroke={is3D ? "#003947" : "#334155"} strokeWidth={16} />
+              <line x1={350} y1={0} x2={350} y2={ALTO} stroke={is3D ? "#003947" : "#334155"} strokeWidth={12} />
+              <line x1={900} y1={0} x2={900} y2={ALTO} stroke={is3D ? "#003947" : "#334155"} strokeWidth={14} />
             </g>
 
-            {/* Residential Blocks */}
-            <g fill="#161C22" stroke="#1E293B" strokeWidth="1">
+            {/* Residential Blocks (3D Extruded Buildings Grid) */}
+            <g fill={is3D ? "rgba(0, 240, 255, 0.06)" : "#161C22"} stroke={is3D ? "#00f0ff" : "#1E293B"} strokeWidth={is3D ? 1.5 : 1}>
               <rect x={120} y={220} width={80} height={50} rx={3} />
               <rect x={220} y={220} width={80} height={50} rx={3} />
               <rect x={120} y={300} width={80} height={50} rx={3} />
@@ -627,17 +722,8 @@ export default function NetworkView({
               <rect x={1040} y={750} width={80} height={50} rx={3} />
             </g>
 
-            {/* 3D Shadows */}
-            {is3D && (
-              <g fill="#1E293B" opacity="0.8">
-                <polygon points="120,270 200,270 200,282 120,282" />
-                <polygon points="220,270 300,270 300,282 220,282" />
-                <polygon points="940,280 1030,280 1030,295 940,295" />
-              </g>
-            )}
-
             {/* Street Labels */}
-            <g fill="#64748B" fontFamily="Inter" fontSize="11" fontWeight="bold" letterSpacing="0.1em">
+            <g fill={is3D ? "#00f0ff" : "#64748B"} fontFamily="Inter" fontSize="11" fontWeight="bold" letterSpacing="0.1em" opacity={is3D ? 0.7 : 1}>
               <text x={40} y={188}>AV. SANAGASTA / RAMÍREZ DE VELASCO</text>
               <text x={40} y={448}>CALLE BAZÁN Y BUSTOS</text>
               <text x={40} y={708}>AV. LOS CACTUS / AV. CIRCUNVALACIÓN</text>
@@ -648,35 +734,81 @@ export default function NetworkView({
             {/* Zones */}
             {ZONAS.map((z) => (
               <g key={z.zona}>
-                <rect x={z.x} y={z.y} width={z.w} height={z.h} fill="#161C22" opacity={0.35} rx={4} stroke="#1E293B" strokeWidth={1} />
-                <text x={z.x + 12} y={z.y + 22} fontSize={11} fontWeight="bold" fill="#51df8e" letterSpacing={2}>
+                <rect x={z.x} y={z.y} width={z.w} height={z.h} fill={is3D ? "rgba(0, 240, 255, 0.03)" : "#161C22"} opacity={0.35} rx={4} stroke={is3D ? "#00f0ff" : "#1E293B"} strokeWidth={1} />
+                <text x={z.x + 12} y={z.y + 22} fontSize={11} fontWeight="bold" fill={is3D ? "#00f0ff" : "#51df8e"} letterSpacing={2}>
                   SECTOR {z.zona}
                 </text>
               </g>
             ))}
 
-            {/* Pipelines (Green = Active Flow; Dashed Gray = Closed / Cut) */}
-            {aristas.map((a, i) => {
-              const fDesde = POSICIONES[a.from];
-              const fHasta = POSICIONES[a.to];
-              if (!fDesde || !fHasta) return null;
-              const cerrada = a.estado === "cerrada";
-              const colorArista = cerrada ? "#475569" : "#12B76A";
-              return (
-                <line
-                  key={i}
-                  x1={fDesde.x}
-                  y1={fDesde.y}
-                  x2={fHasta.x}
-                  y2={fHasta.y}
-                  stroke={colorArista}
-                  strokeWidth={cerrada ? 1.8 : 3}
-                  strokeDasharray={cerrada ? "5 5" : undefined}
-                  opacity={cerrada ? 0.4 : 0.85}
-                  markerEnd={cerrada ? undefined : "url(#flecha)"}
-                />
-              );
-            })}
+            {/* SUBTERRANEAN UNDERGROUND PIPELINE NETWORK (TONY STARK 3D MODE) */}
+            {is3D &&
+              aristas.map((a, i) => {
+                const fDesde = POSICIONES[a.from];
+                const fHasta = POSICIONES[a.to];
+                if (!fDesde || !fHasta) return null;
+                const cerrada = a.estado === "cerrada";
+                // Underground depth Z offset (+40px)
+                const y1Sub = fDesde.y + 40;
+                const y2Sub = fHasta.y + 40;
+
+                return (
+                  <g key={`sub-${i}`}>
+                    {/* Underground Conduit Outline */}
+                    <line
+                      x1={fDesde.x}
+                      y1={y1Sub}
+                      x2={fHasta.x}
+                      y2={y2Sub}
+                      stroke={cerrada ? "#D92D20" : "#00f0ff"}
+                      strokeWidth={cerrada ? 2 : 4}
+                      strokeDasharray={cerrada ? "6 6" : "8 4"}
+                      opacity={cerrada ? 0.5 : 0.9}
+                      markerEnd={cerrada ? undefined : "url(#flecha-sub)"}
+                    >
+                      {!cerrada && (
+                        <animate attributeName="stroke-dashoffset" values="0;-24" dur="1s" repeatCount="indefinite" />
+                      )}
+                    </line>
+                    {/* Glowing Hydro-Pulse Core */}
+                    {!cerrada && (
+                      <line
+                        x1={fDesde.x}
+                        y1={y1Sub}
+                        x2={fHasta.x}
+                        y2={y2Sub}
+                        stroke="#FFFFFF"
+                        strokeWidth="1.5"
+                        opacity={0.8}
+                      />
+                    )}
+                  </g>
+                );
+              })}
+
+            {/* SURFACE PIPELINES (2D MODE) */}
+            {!is3D &&
+              aristas.map((a, i) => {
+                const fDesde = POSICIONES[a.from];
+                const fHasta = POSICIONES[a.to];
+                if (!fDesde || !fHasta) return null;
+                const cerrada = a.estado === "cerrada";
+                const colorArista = cerrada ? "#475569" : "#12B76A";
+                return (
+                  <line
+                    key={i}
+                    x1={fDesde.x}
+                    y1={fDesde.y}
+                    x2={fHasta.x}
+                    y2={fHasta.y}
+                    stroke={colorArista}
+                    strokeWidth={cerrada ? 1.8 : 3}
+                    strokeDasharray={cerrada ? "5 5" : undefined}
+                    opacity={cerrada ? 0.4 : 0.85}
+                    markerEnd={cerrada ? undefined : "url(#flecha)"}
+                  />
+                );
+              })}
 
             {/* Distinct Node Vector Symbols */}
             {nodos.map((n) => {
@@ -694,7 +826,7 @@ export default function NetworkView({
                   ? COLORES_SEVERIDAD[sev]
                   : COLOR_NODO_BASE[n.tipo] ?? "#94A3B8";
 
-              const contorno = esSeleccionado ? "#51df8e" : "#E2E8F0";
+              const contorno = esSeleccionado ? (is3D ? "#00f0ff" : "#51df8e") : "#E2E8F0";
 
               return (
                 <g
@@ -705,27 +837,20 @@ export default function NetworkView({
                   }}
                   style={{ cursor: "pointer" }}
                 >
-                  {is3D && <ellipse cx={p.x} cy={p.y + 14} rx={14} ry={7} fill="#000000" opacity={0.6} />}
-
                   {/* HIGH VISIBILITY SELECTION HIGHLIGHT RINGS & CROSSHAIR */}
                   {esSeleccionado && (
                     <g>
-                      {/* Rotating Neon Green Outer Ring */}
-                      <circle cx={p.x} cy={p.y} r={32} fill="none" stroke="#51df8e" strokeWidth="2.5" strokeDasharray="6 3">
+                      {/* Rotating Neon Green / Cyan Outer Ring */}
+                      <circle cx={p.x} cy={is3D ? p.y - 30 : p.y} r={36} fill="none" stroke={is3D ? "#00f0ff" : "#51df8e"} strokeWidth="2.5" strokeDasharray="6 3">
                         <animate attributeName="stroke-dashoffset" values="0;18" dur="1s" repeatCount="indefinite" />
-                        <animate attributeName="r" values="26;34;26" dur="1.5s" repeatCount="indefinite" />
+                        <animate attributeName="r" values="30;38;30" dur="1.5s" repeatCount="indefinite" />
                       </circle>
                       {/* Inner Glowing Aura */}
-                      <circle cx={p.x} cy={p.y} r={22} fill="rgba(81, 223, 142, 0.25)" stroke="#51df8e" strokeWidth="1.5" />
-                      {/* Target Crosshairs */}
-                      <line x1={p.x - 38} y1={p.y} x2={p.x - 22} y2={p.y} stroke="#51df8e" strokeWidth="2" />
-                      <line x1={p.x + 22} y1={p.y} x2={p.x + 38} y2={p.y} stroke="#51df8e" strokeWidth="2" />
-                      <line x1={p.x} y1={p.y - 38} x2={p.x} y2={p.y - 22} stroke="#51df8e" strokeWidth="2" />
-                      <line x1={p.x} y1={p.y + 22} x2={p.x} y2={p.y + 38} stroke="#51df8e" strokeWidth="2" />
+                      <circle cx={p.x} cy={is3D ? p.y - 30 : p.y} r={24} fill={is3D ? "rgba(0, 240, 255, 0.3)" : "rgba(81, 223, 142, 0.25)"} stroke={is3D ? "#00f0ff" : "#51df8e"} strokeWidth="1.5" />
 
                       {/* Selected Node Badge Header */}
-                      <g transform={`translate(${p.x - 45}, ${p.y - 42})`}>
-                        <rect width="90" height="18" rx="3" fill="#51df8e" />
+                      <g transform={`translate(${p.x - 45}, ${is3D ? p.y - 82 : p.y - 42})`}>
+                        <rect width="90" height="18" rx="3" fill={is3D ? "#00f0ff" : "#51df8e"} />
                         <text x="45" y="13" textAnchor="middle" fontSize="9" fontWeight="900" fill="#00391d" letterSpacing="0.08em">
                           SELECCIONADO
                         </text>
@@ -734,29 +859,24 @@ export default function NetworkView({
                   )}
 
                   {sev === "sin_servicio" && !esSeleccionado && (
-                    <circle cx={p.x} cy={p.y} r={24} fill="none" stroke="#D92D20" strokeWidth={1.5} opacity={0.75}>
+                    <circle cx={p.x} cy={is3D ? p.y - 30 : p.y} r={26} fill="none" stroke="#D92D20" strokeWidth="1.5" opacity={0.75}>
                       <animate attributeName="r" values="14;28;14" dur="2s" repeatCount="indefinite" />
                       <animate attributeName="opacity" values="0.9;0.2;0.9" dur="2s" repeatCount="indefinite" />
                     </circle>
                   )}
-                  {sev === "baja_presion" && !esSeleccionado && (
-                    <circle cx={p.x} cy={p.y} r={20} fill="none" stroke="#F79009" strokeWidth={1} opacity={0.5}>
-                      <animate attributeName="r" values="12;22;12" dur="3s" repeatCount="indefinite" />
-                    </circle>
-                  )}
 
-                  {/* Render Custom Vector Icon per Node Type */}
+                  {/* Render Custom Vector Icon per Node Type (2D or Tony Stark 3D Extruded) */}
                   {renderSimboloNodo(n, fill, contorno, p.x, p.y)}
 
                   <title>{n.nombre}</title>
                   {etiquetas && n.tipo === "barrio" && (
                     <text
                       x={p.x}
-                      y={p.y + (esSeleccionado ? 34 : 28)}
+                      y={p.y + (is3D ? 18 : esSeleccionado ? 34 : 28)}
                       textAnchor="middle"
                       fontSize={11}
                       fontWeight="bold"
-                      fill={esSeleccionado ? "#51df8e" : "#E2E8F0"}
+                      fill={esSeleccionado ? (is3D ? "#00f0ff" : "#51df8e") : "#E2E8F0"}
                       style={{ userSelect: "none", pointerEvents: "none" }}
                     >
                       {etiquetaCorta(n.nombre)}
