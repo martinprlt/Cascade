@@ -72,9 +72,13 @@ const INFO_TIPO_NODO: Record<
 };
 
 const POSICIONES: Record<string, { x: number; y: number }> = {
-  "acu-sanagasta": { x: 110, y: 80 },
-  "valvula-sanagasta": { x: 210, y: 80 },
+  "acu-dique-los-sauces": { x: 40, y: 40 },
+  "planta-padercitas": { x: 80, y: 70 },
+  "valvula-padercitas": { x: 120, y: 110 },
+  "acu-sanagasta": { x: 160, y: 80 },
+  "valvula-sanagasta": { x: 230, y: 80 },
   "tanque-oeste": { x: 210, y: 170 },
+  "barrio-faldeo-del-velasco": { x: 310, y: 180 },
   "dist-oeste": { x: 210, y: 290 },
   "perf-plaza-pesebre": { x: 50, y: 180 },
   "perf-cochangasta": { x: 50, y: 230 },
@@ -86,6 +90,9 @@ const POSICIONES: Record<string, { x: number; y: number }> = {
   "valvula-rama-alta": { x: 330, y: 120 },
   "barrio-san-nicolas": { x: 430, y: 90 },
   "barrio-don-bosco": { x: 430, y: 160 },
+  "barrio-vargas": { x: 440, y: 220 },
+  "perf-vargas": { x: 380, y: 270 },
+  "valvula-dist-centro": { x: 380, y: 320 },
   "barrio-centro": { x: 330, y: 250 },
   "tanque-central": { x: 450, y: 350 },
   "valvula-este": { x: 600, y: 320 },
@@ -94,6 +101,8 @@ const POSICIONES: Record<string, { x: number; y: number }> = {
   "barrio-yacampis": { x: 930, y: 230 },
   "barrio-la-rodadera": { x: 930, y: 320 },
   "barrio-centro-comercial": { x: 930, y: 410 },
+  "perf-parque-industrial": { x: 840, y: 450 },
+  "barrio-parque-industrial": { x: 930, y: 480 },
   "dist-sur": { x: 540, y: 470 },
   "bomba-sur": { x: 660, y: 470 },
   "valvula-cactus": { x: 540, y: 540 },
@@ -105,6 +114,7 @@ const POSICIONES: Record<string, { x: number; y: number }> = {
   "barrio-procrear": { x: 470, y: 645 },
   "barrio-nk-alta": { x: 550, y: 645 },
   "barrio-las-talas-alta": { x: 630, y: 645 },
+  "barrio-virgen-de-guadalupe": { x: 660, y: 645 },
   "barrio-luis-vernet": { x: 740, y: 530 },
   "barrio-el-mirador": { x: 820, y: 530 },
   "barrio-coop-santa-rosa": { x: 900, y: 530 },
@@ -119,9 +129,9 @@ const POSICIONES: Record<string, { x: number; y: number }> = {
 };
 
 const ZONAS: Array<{ zona: string; x: number; y: number; w: number; h: number }> = [
-  { zona: "OESTE (Ramal Sanagasta)", x: 20, y: 40, w: 440, h: 460 },
-  { zona: "CENTRO", x: 300, y: 220, w: 170, h: 160 },
-  { zona: "ESTE (Acueducto 2022)", x: 580, y: 200, w: 390, h: 240 },
+  { zona: "OESTE (Sanagasta & Las Padercitas)", x: 20, y: 20, w: 440, h: 480 },
+  { zona: "CENTRO (Vargas & Urbano)", x: 300, y: 210, w: 170, h: 170 },
+  { zona: "ESTE (Acueducto & Parque Industrial)", x: 580, y: 200, w: 390, h: 300 },
   { zona: "SUR (Perforaciones & Los Cactus)", x: 30, y: 440, w: 940, h: 235 },
 ];
 
@@ -201,7 +211,6 @@ export default function NetworkView({
         return (
           <g transform={`translate(${x - 14}, ${y - 14})`}>
             <circle cx="14" cy="14" r="14" fill={fill} stroke={contorno} strokeWidth="1.5" />
-            {/* House Roof & Body Vector Path */}
             <path d="M 14 6 L 6 13 L 8 13 L 8 21 L 20 21 L 20 13 L 22 13 Z" fill="#FFFFFF" opacity={0.9} />
             <rect x="12" y="16" width="4" height="5" fill={fill} />
           </g>
@@ -210,7 +219,6 @@ export default function NetworkView({
         return (
           <g transform={`translate(${x - 12}, ${y - 12})`}>
             <circle cx="12" cy="12" r="12" fill={fill} stroke={contorno} strokeWidth="1.5" />
-            {/* Water Drop Symbol */}
             <path d="M 12 5 C 9 9, 7 12, 7 15 A 5 5 0 0 0 17 15 C 17 12, 15 9, 12 5 Z" fill="#FFFFFF" />
           </g>
         );
@@ -233,7 +241,6 @@ export default function NetworkView({
         return (
           <g transform={`translate(${x - 13}, ${y - 13})`}>
             <circle cx="13" cy="13" r="13" fill={fill} stroke={contorno} strokeWidth="1.5" />
-            {/* Turbine / Pump Blade Icon */}
             <circle cx="13" cy="13" r="5" fill="#FFFFFF" />
             <path d="M 13 4 L 13 22 M 4 13 L 22 13" stroke={fill} strokeWidth="2" />
           </g>
@@ -241,7 +248,6 @@ export default function NetworkView({
       case "valvula":
         return (
           <g transform={`translate(${x - 13}, ${y - 13})`}>
-            {/* Valve Diamond Shape */}
             <polygon points="13,2 24,13 13,24 2,13" fill={fill} stroke={contorno} strokeWidth="1.5" />
             <circle cx="13" cy="13" r="3.5" fill="#FFFFFF" />
           </g>
@@ -299,7 +305,7 @@ export default function NetworkView({
           }}
         >
           <span style={{ width: 7, height: 7, backgroundColor: "#51df8e", borderRadius: "50%", display: "inline-block" }}></span>
-          SYSTEM: LA_RIOJA_GIS_OVERLAY
+          SYSTEM: LA_RIOJA_GIS_OVERLAY (54 NODOS)
         </div>
 
         {/* Node Type Legend */}
@@ -317,7 +323,7 @@ export default function NetworkView({
             <span>Acueducto</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.tanque }}>water_full</span>
+            <span className="material-symbols-outlined" style={{ fontSize: 13, color: COLOR_NODO_BASE.tanque }}>tanque</span>
             <span>Tanque</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -378,22 +384,22 @@ export default function NetworkView({
         </button>
       </div>
 
-      {/* Interactive Node Property Inspector Drawer tailored per node type */}
+      {/* Interactive Node Inspector Card - Repositioned cleanly in Top-Right Corner */}
       {nodoSeleccionado && (
         <div
           style={{
             position: "absolute",
-            bottom: 16,
-            left: 16,
+            top: 56,
+            right: 16,
             zIndex: 40,
-            backgroundColor: "rgba(16, 27, 46, 0.98)",
+            backgroundColor: "rgba(14, 20, 26, 0.96)",
             border: `1px solid ${COLOR_NODO_BASE[nodoSeleccionado.tipo]}`,
             padding: 16,
             borderRadius: 6,
-            width: 330,
+            width: 320,
             color: "#E2E8F0",
             fontSize: 12,
-            boxShadow: "0 12px 32px rgba(0,0,0,0.8)",
+            boxShadow: "0 12px 32px rgba(0,0,0,0.85)",
             backdropFilter: "blur(12px)",
           }}
         >
@@ -422,7 +428,7 @@ export default function NetworkView({
           {/* Tailored Failure Simulation Controls */}
           <div style={{ backgroundColor: "#161C22", border: "1px solid #1E293B", borderRadius: 4, padding: 10 }}>
             <div style={{ fontSize: 10, fontWeight: 800, color: "#51df8e", letterSpacing: "0.05em", marginBottom: 6 }}>
-              SIMULACIÓN DE IMPACTO ESPECÍFICO DE TIPO
+              SIMULACIÓN DE IMPACTO DE NODO EN VIVO
             </div>
 
             <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
